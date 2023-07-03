@@ -2,7 +2,7 @@
 
 # Markdown syntax practice
 
-_italic_ and **bold**
+## _italic_ and **bold**
 
 ## Lists
 
