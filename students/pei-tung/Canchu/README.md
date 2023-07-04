@@ -2,15 +2,15 @@
 
 ## Start a web server on port 80
 
-Install node:
-`curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -`
-`sudo apt-get install -y nodejs`
+1. Install node:
+   `curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -`\
+   `sudo apt-get install -y nodejs`
 
-Initialize npm in the working directory:
-`npm init`
+1. Initialize npm in the working directory:
+   `npm init`
 
-Install Express in the working directory:
-`npm install express`
+1. Install Express in the working directory:
+   `npm install express`
 
 Create the app.js file with Vim Editor:
 
@@ -29,58 +29,54 @@ console.log("Listening on port 80");
 
 ## Run Web Server in the Background with Docker
 
-Install Docker:
-`sudo apt install docker.io`
-`sudo systemctl start docker`
-`sudo systemctl enable docker`
-`sudo usermod -aG docker ubuntu`
+1. Install Docker:
+   `sudo apt install docker.io`\
+   `sudo systemctl start docker`\
+   `sudo systemctl enable docker`\
+   `sudo usermod -aG docker ubuntu`
 
-Verify the installation:
-`sudo docker info`
+1. Verify the installation:
+   `sudo docker info`
 
-Create a Dockerfile:
+1. Create a Dockerfile:
 
-```
-# Use a base image
+   ```
 
-FROM node:14
+   # Use a base image
 
-# Use a base image
+   FROM node:14
 
-FROM node:14
+   # Set the working directory inside the container
 
-# Set the working directory inside the container
+   WORKDIR /app
 
-WORKDIR /app
+   # Copy the necessary files to the container
 
-# Copy the necessary files to the container
+   COPY app/app.js .
+   COPY app/package\*.json ./
 
-COPY app/app.js .
-COPY app/package\*.json ./
+   # Install dependencies or run any necessary commands
 
-# Install dependencies or run any necessary commands
+   RUN npm install
 
-RUN npm install
 
-# Expose the port that your web server listens on
+    # Expose the port that your web server listens on
 
-EXPOSE 80
+    EXPOSE 80
 
-# Specify the command to run your web server
+    # Specify the command to run your web server
 
-CMD ["node","app.js"]
+    CMD ["node","app.js"]
 
-(dockerfile 在 week_0_part_2 的外面)
-```
+   ```
 
 The project structure should be like this:
 
-- Dockerfile
-- week_0_part_2/
-  - app.js
+> Dockerfile
+> app/app.js
 
-Build the Docker Image:
-`docker build -t my-web-server .`
+1. Build the Docker Image:
+   `docker build -t my-web-server .`
 
-Run the Container:
-`docker run -d -p 80:80 my-web-server`
+1. Run the Container:
+   `docker run -d -p 80:80 my-web-server`
