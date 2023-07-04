@@ -2,7 +2,7 @@
 
 ## Start a web server on port 80
 
-1. Install node:
+1. Install node:\
    `curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -`\
    `sudo apt-get install -y nodejs`
 
@@ -29,7 +29,7 @@ console.log("Listening on port 80");
 
 ## Run Web Server in the Background with Docker
 
-1. Install Docker:
+1. Install Docker:\
    `sudo apt install docker.io`\
    `sudo systemctl start docker`\
    `sudo systemctl enable docker`\
@@ -70,10 +70,10 @@ console.log("Listening on port 80");
 
    ```
 
-The project structure should be like this:
+   The project structure should be like this:
 
-> Dockerfile
-> app/app.js
+   > Dockerfile
+   > app/app.js
 
 1. Build the Docker Image:
    `docker build -t my-web-server .`
