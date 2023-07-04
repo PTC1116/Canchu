@@ -72,8 +72,9 @@ console.log("Listening on port 80");
 
    The project structure should be like this:
 
-   > Dockerfile
+   > Dockerfile\
    > app/app.js
+   > (In this case, Dockerfile is placed outside the app file)
 
 1. Build the Docker Image:
    `docker build -t my-web-server .`
