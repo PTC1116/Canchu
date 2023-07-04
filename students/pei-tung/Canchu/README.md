@@ -1,51 +1,83 @@
-# 陳姵彤
+## My sever Ip: 13.211.10.154
 
-# Markdown syntax practice
+## Start a web server on port 80
 
-## _italic_ and **bold**
+1. Install node:\
+   `curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -`\
+   `sudo apt-get install -y nodejs`
 
-## Lists
+1. Initialize npm in the working directory:
+   `npm init`
 
-#### Unordered
+1. Install Express in the working directory:
+   `npm install express`
 
-- item 1
-- item 2
-- item 3
-
-#### Ordered
-
-1. item 1
-1. item 2
-1. item 3
-
-## Links
-
-The Latest News from [the BBC](www.bbc.com/news)
-
-## [Tables](https://www.runoob.com/markdown/md-table.html)
-
-## Soft Break
-
-#### Add two spaces after each line
-
-Ah! sweet indeed to rest within the womb  
- Of Earth, great mother of eternal sleep,  
-But sweeter far for thee a restless tomb
-
-#### Add nothing after each line
-
-Ah! sweet indeed to rest within the womb
-Of Earth, great mother of eternal sleep,
-But sweeter far for thee a restless tomb
-
-## Blockquotes
-
-> Notice the spaces in the syntax
->
-> > `#h1` and `# h1` are different
-
-## Blocks of code
+Create the app.js file with Vim Editor:
 
 ```
-console.log("Hello World");
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+res.send("<h1>Welcome to my sever</h1>");
+});
+
+app.listen(80, () => {
+console.log("Listening on port 80");
+});
 ```
+
+## Run Web Server in the Background with Docker
+
+1. Install Docker:\
+   `sudo apt install docker.io`\
+   `sudo systemctl start docker`\
+   `sudo systemctl enable docker`\
+   `sudo usermod -aG docker ubuntu`
+
+1. Verify the installation:
+   `sudo docker info`
+
+1. Create a Dockerfile:
+
+   ```
+
+   # Use a base image
+
+   FROM node:14
+
+   # Set the working directory inside the container
+
+   WORKDIR /app
+
+   # Copy the necessary files to the container
+
+   COPY app/app.js .
+   COPY app/package\*.json ./
+
+   # Install dependencies or run any necessary commands
+
+   RUN npm install
+
+
+    # Expose the port that your web server listens on
+
+    EXPOSE 80
+
+    # Specify the command to run your web server
+
+    CMD ["node","app.js"]
+
+   ```
+
+   The project structure should be like this:
+
+   > Dockerfile\
+   > app/app.js
+   > (In this case, Dockerfile is placed outside the app file)
+
+1. Build the Docker Image:
+   `docker build -t my-web-server .`
+
+1. Run the Container:
+   `docker run -d -p 80:80 my-web-server`
