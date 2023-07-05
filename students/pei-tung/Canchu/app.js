@@ -87,6 +87,6 @@ app.post("/users/signup", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(80, () => {
   console.log("Server started on port 3600");
 });
