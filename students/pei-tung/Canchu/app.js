@@ -44,7 +44,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
           console.log(result);
           return res.status(403).send("Sign Up Failed");
         } else {
-          await db.query(
+          db.query(
             "INSERT INTO user (provider, name, email, password) VALUES (?, ?, ?, ?)",
             [provider, name, email, hashedPassword],
             async (err, result) => {
