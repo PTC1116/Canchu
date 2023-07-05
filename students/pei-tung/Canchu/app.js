@@ -38,8 +38,9 @@ app.post("/api/1.0/users/signup", async (req, res) => {
           console.log("Error:", err.message);
           return res.status(500).send("Server Error Response");
         }
-        if (result) {
+        if (result.length === 0) {
           // email already exists
+          console.log(result);
           return res.status(403).send("Sign Up Failed");
         } else {
           await db.query(
