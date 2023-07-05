@@ -14,12 +14,13 @@ const db = mysql2.createConnection({
 
 app.use(express.json());
 
+const salt = bcrypt.genSaltSync(10);
+
 app.post("/api/1.0/users/signup", async (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
     const provider = "native";
-    const salt = bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     if (
