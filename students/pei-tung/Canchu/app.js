@@ -82,7 +82,9 @@ app.post("/users/signup", async (req, res) => {
         );
       }
     );
-  } catch (error) {}
+  } catch (error) {
+    console.log("error");
+  }
 });
 
 app.listen(3000, () => {
