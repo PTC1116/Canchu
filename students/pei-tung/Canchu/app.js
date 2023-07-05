@@ -14,7 +14,7 @@ const db = mysql2.createConnection({
 
 app.use(express.json());
 
-app.post("/users/signup", async (req, res) => {
+app.post("/api/1.0/users/signup", async (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
