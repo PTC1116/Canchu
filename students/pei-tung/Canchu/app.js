@@ -45,7 +45,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
       email.trim().length === 0 ||
       password.trim().length === 0
     ) {
-      return res.status(404).send("Sign Up Failed");
+      return res.status(400).send("Sign Up Failed");
     }
     pool.getConnection((err, conn) => {
       if (err) {
