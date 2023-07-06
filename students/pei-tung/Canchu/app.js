@@ -90,5 +90,5 @@ app.post("/api/1.0/users/signup", (req, res) => {
 });
 
 app.listen(80, () => {
-  console.log("Server started on port 3600");
+  console.log("Server started on port 80");
 });
