@@ -5,6 +5,9 @@ const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
 
 const app = express();
+
+app.use(express.json());
+
 const db = mysql2.createConnection({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
@@ -12,7 +15,11 @@ const db = mysql2.createConnection({
   database: process.env.DATABASE_NAME,
 });
 
-app.use(express.json());
+db.connect((err) => {
+  if (err) {
+    console.log(error);
+  }
+});
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -32,7 +39,7 @@ app.post("/api/1.0/users/signup", (req, res) => {
     }
 
     db.query(
-      "SELECT email FROM user WHERE email = ?",
+      "SELECT email FROM users WHERE email = ?",
       [email],
       (err, result) => {
         if (err) {
@@ -43,28 +50,28 @@ app.post("/api/1.0/users/signup", (req, res) => {
           // email already exists
           console.log(result);
           return res.status(403).send("Sign Up Failed");
-        } else {
-          db.query(
-            "INSERT INTO user (provider, name, email, password) VALUES (?, ?, ?, ?)",
-            [provider, name, email, hashedPassword],
-            async (err, result) => {
-              if (err) {
-                console.log("Error:", err.message);
-                return res.status(500).send("Server Error Response");
-              } else {
-                console.log("success");
-              }
-            }
-          );
         }
         db.query(
-          "SELECT * FROM user WHERE email = ?",
+          "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)",
+          [name, email, password, provider],
+          (err, result) => {
+            console.log(provider, name, email, hashedPassword);
+            if (err) {
+              console.log("2");
+              console.log("Error:", err.message);
+              return res.status(500).send("Server Error Response");
+            }
+          }
+        );
+        db.query(
+          "SELECT * FROM users WHERE email = ?",
           [email],
           (err, result) => {
             if (err) {
               console.log("Error:", err.message);
               return res.status(500).send("Server Error Response");
             }
+            console.log(result);
             const { id, provider, name, email, picture } = result[0];
             const token = jwt.sign({ id }, process.env.JWT_KEY);
             const successRes = {
