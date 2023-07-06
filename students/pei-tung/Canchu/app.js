@@ -37,7 +37,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     if (!validateEmail(email)) {
-      return res.status(404).send("Invalid Email Address");
+      return res.status(400).send("Invalid Email Address");
     }
 
     if (
