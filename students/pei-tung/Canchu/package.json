@@ -2,7 +2,7 @@
   "name": "canchu",
   "version": "1.0.0",
   "description": "## Start a web server on port 80",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

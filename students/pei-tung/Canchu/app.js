@@ -16,12 +16,12 @@ app.use(express.json());
 
 const salt = bcrypt.genSaltSync(10);
 
-app.post("/api/1.0/users/signup", async (req, res) => {
+app.post("/api/1.0/users/signup", (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
     const provider = "native";
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = bcrypt.hash(password, salt);
 
     if (
       name.trim().length === 0 ||
@@ -34,7 +34,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     db.query(
       "SELECT email FROM user WHERE email = ?",
       [email],
-      async (err, result) => {
+      (err, result) => {
         if (err) {
           console.log("Error:", err.message);
           return res.status(500).send("Server Error Response");
@@ -58,9 +58,9 @@ app.post("/api/1.0/users/signup", async (req, res) => {
           );
         }
         db.query(
-          "SELECT * FROM your_table WHERE email = ?",
+          "SELECT * FROM user WHERE email = ?",
           [email],
-          async (err, result) => {
+          (err, result) => {
             if (err) {
               console.log("Error:", err.message);
               return res.status(500).send("Server Error Response");
