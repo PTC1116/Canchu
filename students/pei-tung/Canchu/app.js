@@ -3,6 +3,8 @@ const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
+const passport = require("passport");
+const FacebookStrategy = require("passport-facebook").Strategy;
 
 const app = express();
 
@@ -158,6 +160,36 @@ app.post("/api/1.0/users/signin", (req, res) => {
         );
         pool.releaseConnection(conn);
       });
+    } else if (provider === "facebook") {
+      /* console.log("hi");
+      facebook auth
+      passport.use(
+        new FacebookStrategy(
+          {
+            clientID: "743404654249561",
+            clientSecret: "dd7814a3dcb04fa909c151b514abc15c",
+            callbackURL:
+              "https://localhost/api/1.0/users/signin/auth/fb/secret",
+            profileFields: ["email", "displayName", "name", "picture"],
+          },
+          function (accessToken, refreshToken, profile, cb) {
+            User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+              console.log(profile);
+              return cb(err, user);
+            });
+          }
+        )
+      );
+
+      app.get("/auth/facebook", passport.authenticate("facebook"));
+
+      app.get(
+        "/auth/facebook/redirect",
+        passport.authenticate("facebook"),
+        function (req, res) {
+          res.redirect("/");
+        }
+      );*/
     } else {
       return res.status(403).send({ error: "Sign In Failed" });
     }
