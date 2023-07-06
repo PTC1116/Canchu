@@ -49,12 +49,12 @@ app.post("/api/1.0/users/signup", async (req, res) => {
         (err, result) => {
           if (err) {
             console.log("Error:", err.message);
-            return res.status(500).send("Server Error Response");
+            return res.status(500).send({ error: "Server Error Response" });
           }
           if (result.length > 0) {
             // email already exists
             console.log(result);
-            return res.status(403).send("Sign Up Failed");
+            return res.status(403).send({ error: "Sign Up Failed" });
           }
 
           conn.query(
@@ -63,7 +63,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
             (err, result) => {
               if (err) {
                 console.log("Error:", err.message);
-                return res.status(500).send("Server Error Response");
+                return res.status(500).send({ error: "Server Error Response" });
               }
             }
           );
@@ -73,7 +73,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
             (err, result) => {
               if (err) {
                 console.log("Error:", err.message);
-                return res.status(500).send("Server Error Response");
+                return res.status(500).send({ error: "Server Error Response" });
               }
               const { id, provider, name, email, picture } = result[0];
               const token = jwt.sign({ id }, process.env.JWT_KEY);
