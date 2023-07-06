@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql2 = require("mysql2");
+const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
@@ -8,27 +8,28 @@ const app = express();
 
 app.use(express.json());
 
-const db = mysql2.createConnection({
+const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
-});
-
-db.connect((err) => {
-  if (err) {
-    console.log(error);
-  }
+  password: process.env.DATABASE_PASSWORD,
+  waitForConnections: true,
+  connectionLimit: 10,
+  maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
+  idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 });
 
 const salt = bcrypt.genSaltSync(10);
 
-app.post("/api/1.0/users/signup", (req, res) => {
+app.post("/api/1.0/users/signup", async (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
     const provider = "native";
-    const hashedPassword = bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     if (
       name.trim().length === 0 ||
@@ -38,7 +39,7 @@ app.post("/api/1.0/users/signup", (req, res) => {
       return res.status(404).send("Sign Up Failed");
     }
 
-    db.query(
+    pool.query(
       "SELECT email FROM users WHERE email = ?",
       [email],
       (err, result) => {
@@ -51,7 +52,7 @@ app.post("/api/1.0/users/signup", (req, res) => {
           console.log(result);
           return res.status(403).send("Sign Up Failed");
         }
-        db.query(
+        pool.query(
           "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)",
           [name, email, password, provider],
           (err, result) => {
@@ -63,7 +64,7 @@ app.post("/api/1.0/users/signup", (req, res) => {
             }
           }
         );
-        db.query(
+        pool.query(
           "SELECT * FROM users WHERE email = ?",
           [email],
           (err, result) => {
