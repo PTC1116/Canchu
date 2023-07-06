@@ -108,6 +108,9 @@ app.post("/api/1.0/users/signup", async (req, res) => {
 app.post("/api/1.0/users/signin", (req, res) => {
   try {
     const { provider, email, password } = req.body;
+    if (Object.keys(req.body).length !== 3) {
+      return res.status(400).send({ error: "Client Error Response" });
+    }
     if (provider === "native") {
       pool.getConnection((err, conn) => {
         if (err) {
@@ -154,7 +157,7 @@ app.post("/api/1.0/users/signin", (req, res) => {
               );
             } else {
               // invaild password and user name
-              return res.status(403).send({ error: "Sign In Failed" });
+              return res.status(403).send({ error: "Sign in Failed" });
             }
           }
         );
