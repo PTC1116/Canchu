@@ -79,7 +79,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
               const token = jwt.sign({ id }, process.env.JWT_KEY);
               const successRes = {
                 data: {
-                  access_token: token, // JWT token,
+                  access_token: token, // JWT token
                   user: {
                     id: id,
                     name: name,
