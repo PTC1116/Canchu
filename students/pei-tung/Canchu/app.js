@@ -75,7 +75,6 @@ app.post("/api/1.0/users/signup", async (req, res) => {
                 console.log("Error:", err.message);
                 return res.status(500).send("Server Error Response");
               }
-              console.log(result);
               const { id, provider, name, email, picture } = result[0];
               const token = jwt.sign({ id }, process.env.JWT_KEY);
               const successRes = {
@@ -90,7 +89,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
                   },
                 },
               };
-              return res.status(200).send(JSON.stringify(successRes));
+              return res.status(200).send(successRes);
             }
           );
         }
