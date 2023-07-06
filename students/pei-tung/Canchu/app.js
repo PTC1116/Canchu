@@ -41,7 +41,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     pool.getConnection((err, conn) => {
       if (err) {
         console.log("Error:", err.message);
-        return res.status(500).send("Database Error Response");
+        return res.status(500).send({ error: "Database Error Response" });
       }
       conn.query(
         "SELECT email FROM users WHERE email = ?",
