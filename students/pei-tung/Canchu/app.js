@@ -86,7 +86,6 @@ app.post("/api/1.0/users/signup", async (req, res) => {
                     name: name,
                     email: email,
                     provider: provider,
-
                     picture: picture,
                   },
                 },
