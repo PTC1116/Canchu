@@ -90,7 +90,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
                   },
                 },
               };
-              return res.status(200).send(successRes);
+              return res.status(200).send(JSON.stringify(successRes));
             }
           );
         }
