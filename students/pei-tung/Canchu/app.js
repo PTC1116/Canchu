@@ -4,6 +4,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
 
+function validateEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
 const app = express();
 
 app.use(express.json());
@@ -30,6 +35,10 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     const { name, email, password } = req.body;
     const provider = "native";
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    if (!validateEmail(email)) {
+      return res.status(404).send("Invalid Email Address");
+    }
 
     if (
       name.trim().length === 0 ||
