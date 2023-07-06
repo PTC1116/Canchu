@@ -4,15 +4,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
 
-function validateEmail(email) {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
-}
-
 const app = express();
 
 app.use(express.json());
 
+// Connect My SQL
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
@@ -20,8 +16,8 @@ const pool = mysql.createPool({
   password: process.env.DATABASE_PASSWORD,
   waitForConnections: true,
   connectionLimit: 10,
-  maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
-  idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+  maxIdle: 10,
+  idleTimeout: 60000,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
@@ -29,16 +25,13 @@ const pool = mysql.createPool({
 
 const salt = bcrypt.genSaltSync(10);
 
+// signup
 app.post("/api/1.0/users/signup", async (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
     const provider = "native";
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    if (!validateEmail(email)) {
-      return res.status(400).send("Invalid Email Address");
-    }
 
     if (
       name.trim().length === 0 ||
@@ -62,7 +55,6 @@ app.post("/api/1.0/users/signup", async (req, res) => {
           }
           if (result.length > 0) {
             // email already exists
-            console.log(result);
             return res.status(403).send({ error: "Sign Up Failed" });
           }
 
@@ -88,7 +80,7 @@ app.post("/api/1.0/users/signup", async (req, res) => {
               const token = jwt.sign({ id }, process.env.JWT_KEY);
               const successRes = {
                 data: {
-                  access_token: token, // JWT token
+                  access_token: token,
                   user: {
                     id: id,
                     name: name,
@@ -107,6 +99,70 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     });
   } catch (error) {
     console.log("error");
+  }
+});
+
+// SignIn
+app.post("/api/1.0/users/signin", (req, res) => {
+  try {
+    const { provider, email, password } = req.body;
+    if (provider === "native") {
+      pool.getConnection((err, conn) => {
+        if (err) {
+          console.log("Error:", err.message);
+          return res.status(500).send({ error: "Database Error Response" });
+        }
+        conn.query(
+          "SELECT * FROM users WHERE email = ?",
+          [email],
+          (err, result) => {
+            if (err) {
+              console.log("Error:", err.message);
+              return res.status(500).send({ error: "Server Error Response" });
+            }
+            console.log(result);
+            if (result.length > 0 && result[0].password === password) {
+              conn.query(
+                "SELECT * FROM users WHERE email = ?",
+                [email],
+                (err, result) => {
+                  if (err) {
+                    console.log("Error:", err.message);
+                    return res
+                      .status(500)
+                      .send({ error: "Server Error Response" });
+                  }
+                  const { id, provider, name, email, picture } = result[0];
+                  const token = jwt.sign({ id }, process.env.JWT_KEY);
+                  const successRes = {
+                    data: {
+                      access_token: token,
+                      user: {
+                        id: id,
+                        name: name,
+                        email: email,
+                        provider: provider,
+                        picture: picture,
+                      },
+                    },
+                  };
+                  res.cookie = token;
+                  return res.status(200).send(successRes);
+                }
+              );
+            } else {
+              // invaild password and user name
+              return res.status(403).send({ error: "Sign In Failed" });
+            }
+          }
+        );
+        pool.releaseConnection(conn);
+      });
+    } else {
+      return res.status(403).send({ error: "Sign In Failed" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 
