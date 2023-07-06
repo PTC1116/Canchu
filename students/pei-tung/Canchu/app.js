@@ -38,60 +38,66 @@ app.post("/api/1.0/users/signup", async (req, res) => {
     ) {
       return res.status(404).send("Sign Up Failed");
     }
-
-    pool.query(
-      "SELECT email FROM users WHERE email = ?",
-      [email],
-      (err, result) => {
-        if (err) {
-          console.log("Error:", err.message);
-          return res.status(500).send("Server Error Response");
-        }
-        if (result.length > 0) {
-          // email already exists
-          console.log(result);
-          return res.status(403).send("Sign Up Failed");
-        }
-        pool.query(
-          "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)",
-          [name, email, password, provider],
-          (err, result) => {
-            console.log(provider, name, email, hashedPassword);
-            if (err) {
-              console.log("2");
-              console.log("Error:", err.message);
-              return res.status(500).send("Server Error Response");
-            }
-          }
-        );
-        pool.query(
-          "SELECT * FROM users WHERE email = ?",
-          [email],
-          (err, result) => {
-            if (err) {
-              console.log("Error:", err.message);
-              return res.status(500).send("Server Error Response");
-            }
-            console.log(result);
-            const { id, provider, name, email, picture } = result[0];
-            const token = jwt.sign({ id }, process.env.JWT_KEY);
-            const successRes = {
-              data: {
-                access_token: token, // JWT token,
-                user: {
-                  id: id,
-                  provider: provider,
-                  name: name,
-                  email: email,
-                  picture: picture,
-                },
-              },
-            };
-            return res.status(200).send(successRes);
-          }
-        );
+    pool.getConnection((err, conn) => {
+      if (err) {
+        console.log("Error:", err.message);
+        return res.status(500).send("Database Error Response");
       }
-    );
+      conn.query(
+        "SELECT email FROM users WHERE email = ?",
+        [email],
+        (err, result) => {
+          if (err) {
+            console.log("Error:", err.message);
+            return res.status(500).send("Server Error Response");
+          }
+          if (result.length > 0) {
+            // email already exists
+            console.log(result);
+            return res.status(403).send("Sign Up Failed");
+          }
+
+          conn.query(
+            "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)",
+            [name, email, password, provider],
+            (err, result) => {
+              if (err) {
+                console.log("Error:", err.message);
+                return res.status(500).send("Server Error Response");
+              }
+            }
+          );
+          conn.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email],
+            (err, result) => {
+              if (err) {
+                console.log("Error:", err.message);
+                return res.status(500).send("Server Error Response");
+              }
+              console.log(result);
+              const { id, provider, name, email, picture } = result[0];
+              const token = jwt.sign({ id }, process.env.JWT_KEY);
+              const successRes = {
+                data: {
+                  access_token: token, // JWT token,
+                  user: {
+                    id: id,
+                    name: name,
+                    email: email,
+                    provider: provider,
+
+                    picture: picture,
+                  },
+                },
+              };
+              return res.status(200).send(successRes);
+            }
+          );
+        }
+      );
+      pool.releaseConnection(conn);
+    });
   } catch (error) {
     console.log("error");
   }
