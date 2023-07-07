@@ -15,7 +15,7 @@ const upload = multer({ storage });
 
 // router.post("/:id/profile", userController.authorization);
 // router.put("/picture", userController.authorization);
-router.post(
+router.get(
   "/:id/profile",
   userController.authorization,
   userController.userProfile
