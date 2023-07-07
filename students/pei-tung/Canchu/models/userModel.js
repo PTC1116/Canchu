@@ -31,27 +31,41 @@ module.exports = {
       });
     });
   },
-  /*userPictureUpdate:,*/ userProfileUpdate: async (name, intro, tags, id) => {
+  userPictureUpdate: async (id, path) => {
     return new Promise((resolve, reject) => {
       pool.getConnection((err, conn) => {
         if (err) {
           reject({ error: "Database Error Response" });
         }
-        conn.query("SELECT * FROM users WHERE id = ?", [id], (err, result) => {
-          if (err) {
-            reject({ error: "Server Error Response" });
-          }
-          conn.query(
-            "UPDATE users SET name = ?, introduction = ?, tags = ? WHERE id = ?",
-            [name, intro, tags, id],
-            (err, result) => {
-              if (err) {
-                reject({ error: "Database Error Response" });
-              }
-              resolve(id);
+        conn.query(
+          "UPDATE users SET picture = ? WHERE id = ?",
+          [path, id],
+          (err, result) => {
+            if (err) {
+              reject({ error: "Database Error Response" });
             }
-          );
-        });
+            resolve(path);
+          }
+        );
+      });
+    });
+  },
+  userProfileUpdate: async (name, intro, tags, id) => {
+    return new Promise((resolve, reject) => {
+      pool.getConnection((err, conn) => {
+        if (err) {
+          reject({ error: "Database Error Response" });
+        }
+        conn.query(
+          "UPDATE users SET name = ?, introduction = ?, tags = ? WHERE id = ?",
+          [name, intro, tags, id],
+          (err, result) => {
+            if (err) {
+              reject({ error: "Database Error Response" });
+            }
+            resolve(id);
+          }
+        );
       });
     });
   },

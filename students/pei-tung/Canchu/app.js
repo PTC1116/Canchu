@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 app.use("/api/1.0/users", require("./routes/userRoutes"));
-// app.use("/", require("./routes/userRoutes"));
+// app.use(express.static("static")); 不確定要不要加這個
 
 // Connect My SQL
 const pool = mysql.createPool({

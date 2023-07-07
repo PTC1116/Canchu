@@ -1,6 +1,7 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv").config();
+const multer = require("multer");
 
 module.exports = {
   authorization: (req, res, next) => {
@@ -34,8 +35,27 @@ module.exports = {
     }
   },
   // userPictureUpdate
-  userPictureUpdate: (req, res) => {
-    console.log("我要哭了");
+  userPictureUpdate: async (req, res) => {
+    const storage = multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, "../static/pictures");
+      },
+      // 不是很懂這段
+      filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix);
+      },
+    });
+    const upload = multer({ storage: storage });
+    const picPath = req.file.path;
+    const id = req.userData.id;
+    const updatedPic = await userModel.userPictureUpdate(id, picPath);
+    const successRes = {
+      data: {
+        picture: updatedPic,
+      },
+    };
+    return res.status(200).send(successRes);
   },
   // userProfileUpdate
   userProfileUpdate: async (req, res) => {
