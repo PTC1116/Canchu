@@ -22,7 +22,7 @@ module.exports = {
   // userProfile
   userProfile: async (req, res) => {
     try {
-      const { id, name, picture } = req.userData;
+      const id = req.params.id;
       const userData = await userModel.userProfile(id);
       const successRes = {
         data: {
