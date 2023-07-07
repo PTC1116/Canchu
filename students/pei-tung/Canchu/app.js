@@ -3,12 +3,12 @@ const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
 
 const app = express();
 
 app.use(express.json());
+app.use("/api/1.0/users", require("./routes/userRoutes"));
+// app.use("/", require("./routes/userRoutes"));
 
 // Connect My SQL
 const pool = mysql.createPool({
@@ -79,17 +79,18 @@ app.post("/api/1.0/users/signup", async (req, res) => {
                 return res.status(500).send({ error: "Server Error Response" });
               }
               const { id, provider, name, email, picture } = result[0];
-              const token = jwt.sign({ id }, process.env.JWT_KEY);
+              const user = {
+                id: id,
+                name: name,
+                email: email,
+                provider: provider,
+                picture: picture,
+              };
+              const token = jwt.sign(user, process.env.JWT_KEY);
               const successRes = {
                 data: {
                   access_token: token,
-                  user: {
-                    id: id,
-                    name: name,
-                    email: email,
-                    provider: provider,
-                    picture: picture,
-                  },
+                  user: user,
                 },
               };
               return res.status(200).send(successRes);
@@ -138,20 +139,20 @@ app.post("/api/1.0/users/signin", (req, res) => {
                       .send({ error: "Server Error Response" });
                   }
                   const { id, provider, name, email, picture } = result[0];
-                  const token = jwt.sign({ id }, process.env.JWT_KEY);
+                  const user = {
+                    id: id,
+                    name: name,
+                    email: email,
+                    provider: provider,
+                    picture: picture,
+                  };
+                  const token = jwt.sign(user, process.env.JWT_KEY);
                   const successRes = {
                     data: {
                       access_token: token,
-                      user: {
-                        id: id,
-                        name: name,
-                        email: email,
-                        provider: provider,
-                        picture: picture,
-                      },
+                      user: user,
                     },
                   };
-                  res.cookie = token;
                   return res.status(200).send(successRes);
                 }
               );
@@ -164,35 +165,7 @@ app.post("/api/1.0/users/signin", (req, res) => {
         pool.releaseConnection(conn);
       });
     } else if (provider === "facebook") {
-      /* console.log("hi");
-      facebook auth
-      passport.use(
-        new FacebookStrategy(
-          {
-            clientID: "743404654249561",
-            clientSecret: "dd7814a3dcb04fa909c151b514abc15c",
-            callbackURL:
-              "https://localhost/api/1.0/users/signin/auth/fb/secret",
-            profileFields: ["email", "displayName", "name", "picture"],
-          },
-          function (accessToken, refreshToken, profile, cb) {
-            User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-              console.log(profile);
-              return cb(err, user);
-            });
-          }
-        )
-      );
-
-      app.get("/auth/facebook", passport.authenticate("facebook"));
-
-      app.get(
-        "/auth/facebook/redirect",
-        passport.authenticate("facebook"),
-        function (req, res) {
-          res.redirect("/");
-        }
-      );*/
+      console.log("still working on this");
     } else {
       return res.status(403).send({ error: "Sign In Failed" });
     }
