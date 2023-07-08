@@ -162,7 +162,7 @@ module.exports = {
       };
       const successRes = {
         data: {
-          user: userData,
+          user: userInfo,
         },
       };
       return res.status(200).send(successRes);
