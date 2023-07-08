@@ -141,7 +141,25 @@ module.exports = {
   userProfile: async (req, res) => {
     try {
       const id = req.params.id;
-      const userData = await userModel.userProfile(id);
+      const userDataResult = await userModel.userProfile(id);
+      const {
+        id: userId,
+        name,
+        picture,
+        friend_count,
+        introduction,
+        tags,
+        friendship,
+      } = userDataResult;
+      const userInfo = {
+        id: userId,
+        name,
+        picture,
+        friend_count,
+        introduction,
+        tags,
+        friendship,
+      };
       const successRes = {
         data: {
           user: userData,
