@@ -21,8 +21,13 @@ module.exports = {
       ) {
         return res.status(400).send("Sign Up Failed");
       }
-
-      const result = await userModel.signUp(name, email, password, provider);
+      const result = await userModel.signUp(
+        name,
+        email,
+        hashedPassword,
+        provider
+      );
+      // 這邊要再優化
       const {
         id: userId,
         provider: userProvider,
@@ -37,18 +42,21 @@ module.exports = {
         provider: userProvider,
         picture: userPicture,
       };
-      console.log(user);
-      const token = jwt.sign(user, process.env.JWT_KEY);
+      const token = jwt.sign(result, process.env.JWT_KEY);
       const successRes = {
         data: {
           access_token: token,
-          user: user,
+          user: result,
         },
       };
       return res.status(200).send(successRes);
     } catch (err) {
       // reject object 會傳到這裡
-      return res.status(err.status).send(err.error);
+      if (err.status) {
+        return res.status(err.status).send(err.error);
+      } else {
+        console.log(err);
+      }
     }
   },
   signIn: async (req, res) => {
@@ -60,7 +68,6 @@ module.exports = {
       if (provider === "native") {
         const result = await userModel.nativeSignIn(email, password);
         const { id, provider, name, email: userEmail, picture } = result;
-        console.log(result);
         const user = {
           id: id,
           name: name,
@@ -109,7 +116,11 @@ module.exports = {
         return res.status(403).send({ error: "Sign In Failed" });
       }
     } catch (err) {
-      return res.status(err.status).send(err.error);
+      if (err.status) {
+        return res.status(err.status).send(err.error);
+      } else {
+        console.log(err);
+      }
     }
   },
   authorization: (req, res, next) => {
@@ -138,31 +149,44 @@ module.exports = {
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      console.log(err);
+      if (err.status) {
+        return res.status(err.status).send(err.error);
+      } else {
+        console.log(err);
+      }
     }
   },
   // userPictureUpdate
   userPictureUpdate: async (req, res) => {
-    const storage = multer.diskStorage({
-      destination: function (req, file, cb) {
-        cb(null, "../../public");
-      },
-      // 不是很懂這段
-      filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix);
-      },
-    });
-    const upload = multer({ storage: storage });
-    const picPath = req.file.path;
-    const id = req.userData.id;
-    const updatedPic = await userModel.userPictureUpdate(id, picPath);
-    const successRes = {
-      data: {
-        picture: updatedPic,
-      },
-    };
-    return res.status(200).send(successRes);
+    try {
+      const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, "../../public");
+        },
+        // 不是很懂這段
+        filename: function (req, file, cb) {
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix);
+        },
+      });
+      const upload = multer({ storage: storage });
+      const picPath = req.file.path;
+      const id = req.userData.id;
+      const updatedPic = await userModel.userPictureUpdate(id, picPath);
+      const successRes = {
+        data: {
+          picture: updatedPic,
+        },
+      };
+      return res.status(200).send(successRes);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send(err.error);
+      } else {
+        console.log(err);
+      }
+    }
   },
   // userProfileUpdate
   userProfileUpdate: async (req, res) => {
@@ -176,22 +200,21 @@ module.exports = {
       ) {
         return res.status(400).send("Client Error Response");
       }
-      const updatedData = await userModel.userProfileUpdate(
-        name,
-        intro,
-        tags,
-        id
-      );
+      const result = await userModel.userProfileUpdate(name, intro, tags, id);
       const successRes = {
         data: {
           user: {
-            id: updatedData,
+            id: result,
           },
         },
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      console.log(err);
+      if (err.status) {
+        return res.status(err.status).send(err.error);
+      } else {
+        console.log(err);
+      }
     }
   },
 };

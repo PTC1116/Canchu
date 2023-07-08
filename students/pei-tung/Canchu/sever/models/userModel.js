@@ -1,7 +1,8 @@
 const mysql = require("mysql2");
 const errMes = require("../../util/errorMessage");
+const bcrypt = require("bcryptjs");
 
-const pool = mysql.createPool({
+const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
   database: process.env.DATABASE_NAME,
@@ -15,82 +16,63 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 0,
 });
 
+const pool = setPool.promise();
+
 module.exports = {
   signUp: async (name, email, password, provider) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          reject(errMes.severError);
-        }
-        conn.query(
-          "SELECT email FROM users WHERE email = ?",
-          [email],
-          (err, result) => {
-            if (err) {
-              reject(errMes.severError);
-            }
-            if (result.length > 0) {
-              reject({ error: "Sign Up Failed", status: 403 });
-            }
-
-            conn.query(
-              "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)",
-              [name, email, password, provider],
-              (err, result) => {
-                if (err) {
-                  reject(errMes.severError);
-                }
-              }
-            );
-            conn.query(
-              "SELECT * FROM users WHERE email = ?",
-              [email],
-              (err, result) => {
-                if (err) {
-                  reject(errMes.severError);
-                }
-                resolve(result[0]);
-              }
-            );
-          }
-        );
-        pool.releaseConnection(conn);
-      });
-    });
+    const conn = await pool.getConnection();
+    try {
+      const emailQuery = "SELECT email FROM users WHERE email = ?";
+      const emailResult = await conn.query(emailQuery, [email]);
+      if (emailResult[0].length > 0) {
+        throw errMes.signUpFailed;
+      }
+      const insertDataQuery =
+        "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)";
+      const insertDataResult = await conn.query(insertDataQuery, [
+        name,
+        email,
+        password,
+        provider,
+      ]);
+      const getUserByEmail = "SELECT * FROM users WHERE email = ?";
+      const result = await conn.query(getUserByEmail, [email]);
+      return result[0][0];
+    } catch (err) {
+      if (err === errMes.signUpFailed) {
+        throw errMes.signUpFailed;
+      } else {
+        throw errMes.severError;
+      }
+    } finally {
+      conn.release();
+    }
   },
   nativeSignIn: async (email, password) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          reject(errMes.severError);
-        }
-        conn.query(
-          "SELECT * FROM users WHERE email = ?",
-          [email],
-          (err, result) => {
-            if (err) {
-              reject(errMes.severError);
-            }
-            if (result.length > 0 && result[0].password === password) {
-              conn.query(
-                "SELECT * FROM users WHERE email = ?",
-                [email],
-                (err, result) => {
-                  if (err) {
-                    reject(errMes.severError);
-                  }
-                  resolve(result[0]);
-                }
-              );
-            } else {
-              // invaild password and user name
-              reject(errMes.signInFailed);
-            }
-          }
-        );
-        pool.releaseConnection(conn);
-      });
-    });
+    const conn = await pool.getConnection();
+    try {
+      const getUserByEmail = "SELECT * FROM users WHERE email = ?";
+      const query = await conn.query(getUserByEmail, [email]);
+      if (query[0].length === 0) {
+        throw errMes.signInFailed;
+      }
+      passwordCheck = await bcrypt.compare(password, query[0][0].password);
+      if (passwordCheck) {
+        const getUserByEmail = "SELECT * FROM users WHERE email = ?";
+        const query = await conn.query(getUserByEmail, [email]);
+        return query[0][0];
+      } else {
+        throw errMes.signInFailed;
+      }
+    } catch (err) {
+      if (err === errMes.signInFailed) {
+        throw errMes.signInFailed;
+      } else {
+        throw errMes.severError;
+      }
+    } finally {
+      await conn.release();
+    }
   },
   fbSignIn: async (name, email, provider) => {
     return new Promise((resolve, reject) => {
@@ -145,22 +127,18 @@ module.exports = {
     });
   },
   userProfile: async (id) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          reject({ error: "Database Error Response" });
-        }
-        conn.query("SELECT * FROM users WHERE id = ?", [id], (err, result) => {
-          if (err) {
-            reject({ error: "Server Error Response" });
-          }
-          resolve(result[0]);
-        });
-        pool.releaseConnection(conn);
-      });
-    });
+    const conn = await pool.getConnection();
+    try {
+      const getUserById = "SELECT * FROM users WHERE id = ?";
+      const query = await conn.query(getUserById, [id]);
+      return query[0];
+    } catch {
+      throw errMes.severError;
+    } finally {
+      await conn.release();
+    }
   },
-  userPictureUpdate: async (id, path) => {
+  /*userPictureUpdate: async (id, path) => {
     return new Promise((resolve, reject) => {
       pool.getConnection((err, conn) => {
         if (err) {
@@ -178,29 +156,33 @@ module.exports = {
         );
       });
     });
+  }*/
+  userPictureUpdate: async (id, path) => {
+    const conn = await pool.getConnection();
+    try {
+      const updatedPicById = "UPDATE users SET picture = ? WHERE id = ?";
+      const result = await conn.query(updatedPicById, [path, id]);
+      console.log(result);
+      return path;
+    } catch (err) {
+      throw errMes.severError;
+    } finally {
+      await conn.release();
+    }
   },
   userProfileUpdate: async (name, intro, tags, id) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          reject({ error: "Database Error Response" });
-        }
-        conn.query(
-          "UPDATE users SET name = ?, introduction = ?, tags = ? WHERE id = ?",
-          [name, intro, tags, id],
-          (err, result) => {
-            if (err) {
-              reject({ error: "Database Error Response" });
-            }
-            resolve(id);
-          }
-        );
-      });
-    });
+    const conn = await pool.getConnection();
+    try {
+      const insertData =
+        "UPDATE users SET name = ?, introduction = ?, tags = ? WHERE id = ?";
+      await conn.query(insertData, [name, intro, tags, id]);
+      return id;
+    } catch (err) {
+      throw errMes.severError;
+    } finally {
+      await conn.release();
+    }
   },
 };
 
-/*module.exports.userProfile = () => {
-  return "3";
-};*/
 // 也可以 module.exports{ a: function()=>{}, b:function() => {module.exports.a()}}
