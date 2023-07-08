@@ -53,7 +53,7 @@ module.exports = {
     } catch (err) {
       // reject object 會傳到這裡
       if (err.status) {
-        return res.status(err.status).send(err.error);
+        return res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
@@ -117,7 +117,7 @@ module.exports = {
       }
     } catch (err) {
       if (err.status) {
-        return res.status(err.status).send(err.error);
+        return res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
@@ -150,7 +150,7 @@ module.exports = {
       return res.status(200).send(successRes);
     } catch (err) {
       if (err.status) {
-        return res.status(err.status).send(err.error);
+        return res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
@@ -182,7 +182,7 @@ module.exports = {
       return res.status(200).send(successRes);
     } catch (err) {
       if (err.status) {
-        return res.status(err.status).send(err.error);
+        return res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
@@ -211,7 +211,7 @@ module.exports = {
       return res.status(200).send(successRes);
     } catch (err) {
       if (err.status) {
-        return res.status(err.status).send(err.error);
+        return res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
