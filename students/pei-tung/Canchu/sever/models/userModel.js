@@ -131,7 +131,7 @@ module.exports = {
     try {
       const getUserById = "SELECT * FROM users WHERE id = ?";
       const query = await conn.query(getUserById, [id]);
-      return query[0];
+      return query[0][0];
     } catch {
       throw errMes.severError;
     } finally {

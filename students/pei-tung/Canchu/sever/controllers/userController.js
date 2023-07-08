@@ -160,6 +160,7 @@ module.exports = {
         tags,
         friendship,
       };
+      console.log(userInfo);
       const successRes = {
         data: {
           user: userInfo,
