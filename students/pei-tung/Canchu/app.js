@@ -3,13 +3,13 @@ const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
-const axios = require("axios");
 
 const app = express();
 
+const userRoutes = require("./sever/routes/userRoutes");
+
 app.use(express.json());
-app.use("/api/1.0/users", require("./routes/userRoutes"));
-// app.use(express.static("static")); 不確定要不要加這個
+app.use("/api/1.0/users", userRoutes);
 
 // Connect My SQL
 const pool = mysql.createPool({
@@ -26,14 +26,13 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 0,
 });
 
-const salt = bcrypt.genSaltSync(10);
-
 // signup
-app.post("/api/1.0/users/signup", async (req, res) => {
+/* app.post("/api/1.0/users/signup", async (req, res) => {
   try {
     // Check if every fields are filled
     const { name, email, password } = req.body;
     const provider = "native";
+    const salt = bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     if (
@@ -104,10 +103,10 @@ app.post("/api/1.0/users/signup", async (req, res) => {
   } catch (error) {
     console.log("error");
   }
-});
+}); */
 
 // SignIn
-app.post("/api/1.0/users/signin", (req, res) => {
+/*app.post("/api/1.0/users/signin", (req, res) => {
   try {
     const { provider, email, password } = req.body;
     if (provider === "native" && Object.keys(req.body).length !== 3) {
@@ -278,7 +277,7 @@ app.post("/api/1.0/users/signin", (req, res) => {
   } catch (err) {
     console.log(err);
   }
-});
+});*/
 
 app.listen(80, () => {
   console.log("Server started on port 80");

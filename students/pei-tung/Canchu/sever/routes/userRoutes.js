@@ -5,7 +5,8 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "static");
+    // 本來想寫路徑但好像應該要寫資料夾名稱？
+    cb(null, "public");
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -15,6 +16,9 @@ const upload = multer({ storage });
 
 // router.post("/:id/profile", userController.authorization);
 // router.put("/picture", userController.authorization);
+
+router.post("/signup", userController.signUp);
+router.post("/signIn", userController.signIn);
 router.get(
   "/:id/profile",
   userController.authorization,
