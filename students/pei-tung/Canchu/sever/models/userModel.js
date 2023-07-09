@@ -56,7 +56,11 @@ module.exports = {
       if (result[0].length === 0) {
         throw errMes.signInFailed;
       }
-      passwordCheck = await bcrypt.compare(password, query[0][0].password);
+      const passwordCheck = await bcrypt.compare(
+        password,
+        result[0][0].password
+      );
+
       if (passwordCheck) {
         const getUserByEmail = "SELECT * FROM users WHERE email = ?";
         const result = await conn.query(getUserByEmail, [email]);
@@ -74,58 +78,7 @@ module.exports = {
       await conn.release();
     }
   },
-  /*fbSignIn: async (name, email, provider) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          console.log("Error:", err.message);
-          return res.status(500).send({ error: "Database Error Response" });
-        }
-        conn.query(
-          "SELECT email FROM users WHERE email = ?",
-          [email],
-          (err, result) => {
-            if (err) {
-              reject(errMes.severError);
-            }
-            if (result.length > 0) {
-              // data already exists
-              conn.query(
-                "SELECT * FROM users WHERE email = ?",
-                [email],
-                (err, result) => {
-                  if (err) {
-                    reject(errMes.severError);
-                  }
-                  resolve(result[0]);
-                }
-              );
-            } else {
-              conn.query(
-                "INSERT INTO users (name, email, provider) VALUES (?,?,?)",
-                [name, email, provider],
-                (err, result) => {
-                  if (err) {
-                    reject(errMes.severError);
-                  }
-                  conn.query(
-                    "SELECT * FROM users WHERE email = ?",
-                    [email],
-                    (err, result) => {
-                      if (err) {
-                        reject(errMes.severError);
-                      }
-                    }
-                  );
-                }
-              );
-            }
-          }
-        );
-        pool.releaseConnection(conn);
-      });
-    });
-  }*/ fbSignIn: async (name, email, provider) => {
+  fbSignIn: async (name, email, provider) => {
     const conn = await pool.getConnection();
     try {
       const emailQuery = "SELECT email FROM users WHERE email = ?";

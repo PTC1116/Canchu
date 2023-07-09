@@ -91,7 +91,6 @@ module.exports = {
         const { id, name, email } = userData.data;
         const provider = "facebook";
         const result = await userModel.fbSignIn(name, email, provider);
-        console.log(result);
         const {
           id: userId,
           provider: userProvider,
