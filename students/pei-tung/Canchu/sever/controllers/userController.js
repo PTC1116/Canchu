@@ -63,7 +63,7 @@ module.exports = {
     try {
       const { provider, email, password } = req.body;
       if (provider === "native" && Object.keys(req.body).length !== 3) {
-        return res.status(400).send({ error: "Client Error Response" });
+        return errMes.clientError;
       }
       if (provider === "native") {
         const result = await userModel.nativeSignIn(email, password);
@@ -85,33 +85,35 @@ module.exports = {
         return res.status(200).send(successRes);
       } else if (provider === "facebook") {
         const accessToken = req.body.access_token;
-        axios
-          .get(
-            `https://graph.facebook.com/v13.0/me?fields=id,name,email&access_token=${accessToken}`
-          )
-          .then((response) => {
-            const { id, name, email } = response.data;
-            const provider = "facebook";
-            return userModel.fbSignIn(name, email, provider);
-          })
-          .then((response) => {
-            const { id, provider, name, email, picture } = response;
-            const user = {
-              id: id,
-              name: name,
-              email: email,
-              provider: provider,
-              picture: picture,
-            };
-            const token = jwt.sign(user, process.env.JWT_KEY);
-            const successRes = {
-              data: {
-                access_token: token,
-                user: user,
-              },
-            };
-            return res.status(200).send(successRes);
-          });
+        const userData = await axios.get(
+          `https://graph.facebook.com/v13.0/me?fields=id,name,email&access_token=${accessToken}`
+        );
+        const { id, name, email } = userData.data;
+        const provider = "facebook";
+        const result = await userModel.fbSignIn(name, email, provider);
+        console.log(result);
+        const {
+          id: userId,
+          provider: userProvider,
+          name: userName,
+          email: userEmail,
+          picture,
+        } = result;
+        const user = {
+          id: userId,
+          name: userName,
+          email: userEmail,
+          provider: userProvider,
+          picture,
+        };
+        const token = jwt.sign(user, process.env.JWT_KEY);
+        const successRes = {
+          data: {
+            access_token: token,
+            user: user,
+          },
+        };
+        return res.status(200).send(successRes);
       } else {
         return res.status(403).send({ error: "Sign In Failed" });
       }
@@ -160,7 +162,6 @@ module.exports = {
         tags,
         friendship,
       };
-      console.log(userInfo);
       const successRes = {
         data: {
           user: userInfo,

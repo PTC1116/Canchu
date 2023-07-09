@@ -52,15 +52,15 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const getUserByEmail = "SELECT * FROM users WHERE email = ?";
-      const query = await conn.query(getUserByEmail, [email]);
-      if (query[0].length === 0) {
+      const result = await conn.query(getUserByEmail, [email]);
+      if (result[0].length === 0) {
         throw errMes.signInFailed;
       }
       passwordCheck = await bcrypt.compare(password, query[0][0].password);
       if (passwordCheck) {
         const getUserByEmail = "SELECT * FROM users WHERE email = ?";
-        const query = await conn.query(getUserByEmail, [email]);
-        return query[0][0];
+        const result = await conn.query(getUserByEmail, [email]);
+        return result[0][0];
       } else {
         throw errMes.signInFailed;
       }
@@ -74,7 +74,7 @@ module.exports = {
       await conn.release();
     }
   },
-  fbSignIn: async (name, email, provider) => {
+  /*fbSignIn: async (name, email, provider) => {
     return new Promise((resolve, reject) => {
       pool.getConnection((err, conn) => {
         if (err) {
@@ -125,13 +125,35 @@ module.exports = {
         pool.releaseConnection(conn);
       });
     });
+  }*/ fbSignIn: async (name, email, provider) => {
+    const conn = await pool.getConnection();
+    try {
+      const emailQuery = "SELECT email FROM users WHERE email = ?";
+      const result = await conn.query(emailQuery, [email]);
+      if (!(result[0].length > 0)) {
+        const insertDataQuery =
+          "INSERT INTO users (name, email, provider) VALUES (?,?,?)";
+        const insertDataResult = await conn.query(insertDataQuery, [
+          name,
+          email,
+          provider,
+        ]);
+      }
+      const getUserByEmail = "SELECT * FROM users WHERE email = ?";
+      const userDataResult = await conn.query(getUserByEmail, [email]);
+      return userDataResult[0][0];
+    } catch (err) {
+      throw errMes.severError;
+    } finally {
+      await conn.release();
+    }
   },
   userProfile: async (id) => {
     const conn = await pool.getConnection();
     try {
       const getUserById = "SELECT * FROM users WHERE id = ?";
-      const query = await conn.query(getUserById, [id]);
-      return query[0][0];
+      const result = await conn.query(getUserById, [id]);
+      return result[0][0];
     } catch {
       throw errMes.severError;
     } finally {
@@ -162,7 +184,6 @@ module.exports = {
     try {
       const updatedPicById = "UPDATE users SET picture = ? WHERE id = ?";
       const result = await conn.query(updatedPicById, [path, id]);
-      console.log(result);
       return path;
     } catch (err) {
       throw errMes.severError;
