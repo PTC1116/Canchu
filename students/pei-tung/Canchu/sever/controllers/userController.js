@@ -21,8 +21,13 @@ module.exports = {
       ) {
         return res.status(400).send("Sign Up Failed");
       }
-
-      const result = await userModel.signUp(name, email, password, provider);
+      const result = await userModel.signUp(
+        name,
+        email,
+        hashedPassword,
+        provider
+      );
+      // 這邊要再優化
       const {
         id: userId,
         provider: userProvider,
@@ -37,30 +42,32 @@ module.exports = {
         provider: userProvider,
         picture: userPicture,
       };
-      console.log(user);
-      const token = jwt.sign(user, process.env.JWT_KEY);
+      const token = jwt.sign(result, process.env.JWT_KEY);
       const successRes = {
         data: {
           access_token: token,
-          user: user,
+          user: result,
         },
       };
       return res.status(200).send(successRes);
     } catch (err) {
       // reject object 會傳到這裡
-      return res.status(err.status).send(err.error);
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
     }
   },
   signIn: async (req, res) => {
     try {
       const { provider, email, password } = req.body;
       if (provider === "native" && Object.keys(req.body).length !== 3) {
-        return res.status(400).send({ error: "Client Error Response" });
+        return errMes.clientError;
       }
       if (provider === "native") {
         const result = await userModel.nativeSignIn(email, password);
         const { id, provider, name, email: userEmail, picture } = result;
-        console.log(result);
         const user = {
           id: id,
           name: name,
@@ -78,38 +85,43 @@ module.exports = {
         return res.status(200).send(successRes);
       } else if (provider === "facebook") {
         const accessToken = req.body.access_token;
-        axios
-          .get(
-            `https://graph.facebook.com/v13.0/me?fields=id,name,email&access_token=${accessToken}`
-          )
-          .then((response) => {
-            const { id, name, email } = response.data;
-            const provider = "facebook";
-            return userModel.fbSignIn(name, email, provider);
-          })
-          .then((response) => {
-            const { id, provider, name, email, picture } = response;
-            const user = {
-              id: id,
-              name: name,
-              email: email,
-              provider: provider,
-              picture: picture,
-            };
-            const token = jwt.sign(user, process.env.JWT_KEY);
-            const successRes = {
-              data: {
-                access_token: token,
-                user: user,
-              },
-            };
-            return res.status(200).send(successRes);
-          });
+        const userData = await axios.get(
+          `https://graph.facebook.com/v13.0/me?fields=id,name,email&access_token=${accessToken}`
+        );
+        const { id, name, email } = userData.data;
+        const provider = "facebook";
+        const result = await userModel.fbSignIn(name, email, provider);
+        const {
+          id: userId,
+          provider: userProvider,
+          name: userName,
+          email: userEmail,
+          picture,
+        } = result;
+        const user = {
+          id: userId,
+          name: userName,
+          email: userEmail,
+          provider: userProvider,
+          picture,
+        };
+        const token = jwt.sign(user, process.env.JWT_KEY);
+        const successRes = {
+          data: {
+            access_token: token,
+            user: user,
+          },
+        };
+        return res.status(200).send(successRes);
       } else {
         return res.status(403).send({ error: "Sign In Failed" });
       }
     } catch (err) {
-      return res.status(err.status).send(err.error);
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
     }
   },
   authorization: (req, res, next) => {
@@ -130,39 +142,70 @@ module.exports = {
   userProfile: async (req, res) => {
     try {
       const id = req.params.id;
-      const userData = await userModel.userProfile(id);
+      const userDataResult = await userModel.userProfile(id);
+      const {
+        id: userId,
+        name,
+        picture,
+        friend_count,
+        introduction,
+        tags,
+        friendship,
+      } = userDataResult;
+      const userInfo = {
+        id: userId,
+        name,
+        picture,
+        friend_count,
+        introduction,
+        tags,
+        friendship,
+      };
       const successRes = {
         data: {
-          user: userData,
+          user: userInfo,
         },
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      console.log(err);
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
     }
   },
   // userPictureUpdate
   userPictureUpdate: async (req, res) => {
-    const storage = multer.diskStorage({
-      destination: function (req, file, cb) {
-        cb(null, "../../public");
-      },
-      // 不是很懂這段
-      filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix);
-      },
-    });
-    const upload = multer({ storage: storage });
-    const picPath = req.file.path;
-    const id = req.userData.id;
-    const updatedPic = await userModel.userPictureUpdate(id, picPath);
-    const successRes = {
-      data: {
-        picture: updatedPic,
-      },
-    };
-    return res.status(200).send(successRes);
+    try {
+      const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, "../../public");
+        },
+        // 不是很懂這段
+        filename: function (req, file, cb) {
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix);
+        },
+      });
+      const upload = multer({ storage: storage });
+      const picPath = req.file.path;
+      const id = req.userData.id;
+      const updatedPic = await userModel.userPictureUpdate(id, picPath);
+      const successRes = {
+        data: {
+          picture: updatedPic,
+        },
+      };
+      return res.status(200).send(successRes);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
   },
   // userProfileUpdate
   userProfileUpdate: async (req, res) => {
@@ -176,22 +219,21 @@ module.exports = {
       ) {
         return res.status(400).send("Client Error Response");
       }
-      const updatedData = await userModel.userProfileUpdate(
-        name,
-        intro,
-        tags,
-        id
-      );
+      const result = await userModel.userProfileUpdate(name, intro, tags, id);
       const successRes = {
         data: {
           user: {
-            id: updatedData,
+            id: result,
           },
         },
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      console.log(err);
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
     }
   },
 };
