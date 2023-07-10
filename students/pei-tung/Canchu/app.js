@@ -11,6 +11,7 @@ const friendRoutes = require("./server/routes/friendRoutes");
 app.use(express.json());
 app.use("/api/1.0/users", userRoutes);
 app.use("/api/1.0/friends", friendRoutes);
+app.use(express.static("public"));
 
 app.listen(80, () => {
   console.log("Server started on port 80");
