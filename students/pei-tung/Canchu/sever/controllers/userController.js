@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const userUtil = require("../../util/userUtil");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
@@ -27,26 +28,12 @@ module.exports = {
         hashedPassword,
         provider
       );
-      // 這邊要再優化
-      const {
-        id: userId,
-        provider: userProvider,
-        name: userName,
-        email: userEmail,
-        picture: userPicture,
-      } = result;
-      const user = {
-        id: userId,
-        name: userName,
-        email: userEmail,
-        provider: userProvider,
-        picture: userPicture,
-      };
-      const token = jwt.sign(result, process.env.JWT_KEY);
+      const user = userUtil.generateUserObj(result);
+      const token = jwt.sign(user, process.env.JWT_KEY);
       const successRes = {
         data: {
           access_token: token,
-          user: result,
+          user: user,
         },
       };
       return res.status(200).send(successRes);
@@ -67,14 +54,7 @@ module.exports = {
       }
       if (provider === "native") {
         const result = await userModel.nativeSignIn(email, password);
-        const { id, provider, name, email: userEmail, picture } = result;
-        const user = {
-          id: id,
-          name: name,
-          email: email,
-          provider: provider,
-          picture: picture,
-        };
+        const user = userUtil.generateUserObj(result);
         const token = jwt.sign(user, process.env.JWT_KEY);
         const successRes = {
           data: {
@@ -91,20 +71,7 @@ module.exports = {
         const { id, name, email } = userData.data;
         const provider = "facebook";
         const result = await userModel.fbSignIn(name, email, provider);
-        const {
-          id: userId,
-          provider: userProvider,
-          name: userName,
-          email: userEmail,
-          picture,
-        } = result;
-        const user = {
-          id: userId,
-          name: userName,
-          email: userEmail,
-          provider: userProvider,
-          picture,
-        };
+        const user = userUtil.generateUserObj(result);
         const token = jwt.sign(user, process.env.JWT_KEY);
         const successRes = {
           data: {
@@ -143,27 +110,10 @@ module.exports = {
     try {
       const id = req.params.id;
       const userDataResult = await userModel.userProfile(id);
-      const {
-        id: userId,
-        name,
-        picture,
-        friend_count,
-        introduction,
-        tags,
-        friendship,
-      } = userDataResult;
-      const userInfo = {
-        id: userId,
-        name,
-        picture,
-        friend_count,
-        introduction,
-        tags,
-        friendship,
-      };
+      const user = userUtil.generateUserDetailObj(userDataResult);
       const successRes = {
         data: {
-          user: userInfo,
+          user: user,
         },
       };
       return res.status(200).send(successRes);
@@ -178,18 +128,6 @@ module.exports = {
   // userPictureUpdate
   userPictureUpdate: async (req, res) => {
     try {
-      const storage = multer.diskStorage({
-        destination: function (req, file, cb) {
-          cb(null, "../../public");
-        },
-        // 不是很懂這段
-        filename: function (req, file, cb) {
-          const uniqueSuffix =
-            Date.now() + "-" + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix);
-        },
-      });
-      const upload = multer({ storage: storage });
       const picPath = req.file.path;
       const id = req.userData.id;
       const updatedPic = await userModel.userPictureUpdate(id, picPath);

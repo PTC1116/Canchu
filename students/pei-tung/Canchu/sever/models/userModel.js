@@ -60,7 +60,6 @@ module.exports = {
         password,
         result[0][0].password
       );
-
       if (passwordCheck) {
         const getUserByEmail = "SELECT * FROM users WHERE email = ?";
         const result = await conn.query(getUserByEmail, [email]);
@@ -113,25 +112,6 @@ module.exports = {
       await conn.release();
     }
   },
-  /*userPictureUpdate: async (id, path) => {
-    return new Promise((resolve, reject) => {
-      pool.getConnection((err, conn) => {
-        if (err) {
-          reject({ error: "Database Error Response" });
-        }
-        conn.query(
-          "UPDATE users SET picture = ? WHERE id = ?",
-          [path, id],
-          (err, result) => {
-            if (err) {
-              reject({ error: "Database Error Response" });
-            }
-            resolve(path);
-          }
-        );
-      });
-    });
-  }*/
   userPictureUpdate: async (id, path) => {
     const conn = await pool.getConnection();
     try {
