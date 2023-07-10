@@ -6,11 +6,11 @@ const router = express.Router();
 
 router.post("/signup", userController.signUp);
 router.post("/signIn", userController.signIn);
-router.get("/:id/profile", auth.authorization, userController.userProfile);
-router.put("/profile", auth.authorization, userController.userProfileUpdate);
+router.get("/:id/profile", auth.auth, userController.userProfile);
+router.put("/profile", auth.auth, userController.userProfileUpdate);
 router.put(
   "/picture",
-  auth.authorization,
+  auth.auth,
   userUtil.pictureUploadSetting().single("picture"),
   userController.userPictureUpdate
 );

@@ -136,6 +136,7 @@ module.exports = {
   userProfileUpdate: async (req, res) => {
     try {
       const id = req.userData.id;
+      console.log(req);
       const { name, introduction: intro, tags } = req.body;
       if (
         name.trim().length === 0 ||
