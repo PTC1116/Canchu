@@ -15,6 +15,7 @@ module.exports = {
       const provider = "native";
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = await bcrypt.hash(password, salt);
+      // 應該要用別的方法驗證，這個方式沒有 name 或 email 或 password 的時候 code 會沒辦法 trim
       if (
         name.trim().length === 0 ||
         email.trim().length === 0 ||
@@ -91,20 +92,6 @@ module.exports = {
       }
     }
   },
-  authorization: (req, res, next) => {
-    if (!req.headers.authorization) {
-      return res.status(401).send({ error: "No Token" });
-    }
-    const token = req.header("Authorization").replace("Bearer ", "");
-    jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
-      if (err) {
-        return res.status(403).send({ error: "Wrong token" });
-      }
-      const { id, name, picture } = decoded;
-      req.userData = { id: id, name: name, picture: picture };
-      return next();
-    });
-  },
   // userProfile
   userProfile: async (req, res) => {
     try {
@@ -149,6 +136,7 @@ module.exports = {
   userProfileUpdate: async (req, res) => {
     try {
       const id = req.userData.id;
+      console.log(req);
       const { name, introduction: intro, tags } = req.body;
       if (
         name.trim().length === 0 ||

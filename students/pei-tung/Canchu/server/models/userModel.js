@@ -42,7 +42,7 @@ module.exports = {
       if (err === errMes.signUpFailed) {
         throw errMes.signUpFailed;
       } else {
-        throw errMes.severError;
+        throw errMes.serverError;
       }
     } finally {
       conn.release();
@@ -71,7 +71,7 @@ module.exports = {
       if (err === errMes.signInFailed) {
         throw errMes.signInFailed;
       } else {
-        throw errMes.severError;
+        throw errMes.serverError;
       }
     } finally {
       await conn.release();
@@ -95,7 +95,7 @@ module.exports = {
       const userDataResult = await conn.query(getUserByEmail, [email]);
       return userDataResult[0][0];
     } catch (err) {
-      throw errMes.severError;
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
@@ -107,7 +107,7 @@ module.exports = {
       const result = await conn.query(getUserById, [id]);
       return result[0][0];
     } catch {
-      throw errMes.severError;
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
@@ -119,7 +119,7 @@ module.exports = {
       const result = await conn.query(updatedPicById, [path, id]);
       return path;
     } catch (err) {
-      throw errMes.severError;
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
@@ -132,7 +132,7 @@ module.exports = {
       await conn.query(insertData, [name, intro, tags, id]);
       return id;
     } catch (err) {
-      throw errMes.severError;
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
