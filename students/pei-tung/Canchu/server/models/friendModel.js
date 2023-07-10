@@ -21,8 +21,25 @@ module.exports = {
   friend: () => {
     return "hi";
   },
-  friendPending: () => {
-    return "pending";
+  friendPending: async (id) => {
+    const conn = await pool.getConnection();
+    try {
+      const findMyRequester = "SELECT * FROM friends WHERE receiverID = ?";
+      const requesterId = await conn.query(findMyRequester, [id]);
+      const requesterData = [];
+      for (let i = 0; i < requesterId[0].length; i++) {
+        const targetId = requesterId[0][i].requesterID;
+        const findRequesterData =
+          "SELECT DISTINCT users.id, name, picture,friends.ID FROM users INNER JOIN friends ON users.id = friends.requesterID WHERE users.id = ?;";
+        const result = await conn.query(findRequesterData, targetId);
+        requesterData.push(result[0][0]);
+      }
+      return requesterData;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await conn.release();
+    }
   },
   friendRequest: async (requesterId, receiverId) => {
     const conn = await pool.getConnection();
@@ -37,7 +54,6 @@ module.exports = {
         receiverId,
         requesterId,
       ]);
-      console.log(receiverResult);
       if (requesterResult[0].length > 0 || receiverResult[0].length > 0) {
         throw errMes.clientError;
       }
@@ -60,8 +76,7 @@ module.exports = {
       if (err === errMes.clientError) {
         throw errMes.clientError;
       } else {
-        throw err;
-        // throw errMes.serverError;
+        throw errMes.serverError;
       }
     } finally {
       await conn.release();

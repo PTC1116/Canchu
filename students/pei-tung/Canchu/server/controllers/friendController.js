@@ -1,16 +1,21 @@
 const errorMes = require("../../util/errorMessage");
+const friendUtil = require("../../util/friendUtil");
 const friendModel = require("../models/friendModel");
 
 module.exports = {
   friend: (req, res) => {
     res.send(friendModel.friend());
   },
-  friendPending: (req, res) => {
-    res.send(friendModel.friendPending());
+  friendPending: async (req, res) => {
+    // 回傳：所有寄了交友邀請給我的人
+    const id = req.userData.id;
+    const searchForRequester = await friendModel.friendPending(id);
+    const users = friendUtil.generateUserSearchObj(searchForRequester);
+    const successObj = { data: { users } };
+    return res.status(200).send(successObj);
   },
   friendRequest: async (req, res) => {
     try {
-      // res.send(friendModel.friendRequest());
       const receiverId = req.params.user_id * 1;
       const requesterId = req.userData.id;
       // prevent users from sending friend request to themselves
@@ -33,10 +38,5 @@ module.exports = {
         console.log(err);
       }
     }
-
-    // 從 URL 中提取 id
-    // 如果成功就回傳收到邀請的人的 id
-
-    // 要禁止對自己發邀請，禁止對已經是朋友的人發邀請，禁止對已經發過邀請的人發邀請
   },
 };
