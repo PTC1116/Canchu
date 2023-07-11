@@ -1,8 +1,7 @@
 module.exports = {
-  generateUserSearchObj: (arr) => {
+  generateUserSearchObj: (arr, status) => {
     const users = [];
     for (i = 0; i < arr.length; i++) {
-      console.log(arr);
       const { userId, name, picture, id: friendshipId } = arr[i];
       const obj = {
         id: userId,
@@ -10,7 +9,7 @@ module.exports = {
         picture,
         friendship: {
           id: friendshipId,
-          status: "pending",
+          status,
         },
       };
       users.push(obj);

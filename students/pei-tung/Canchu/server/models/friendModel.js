@@ -19,8 +19,45 @@ const setPool = mysql.createPool({
 const pool = setPool.promise();
 
 module.exports = {
-  friend: () => {
-    return "hi";
+  showAllFriends: async (id) => {
+    const conn = await pool.getConnection();
+    try {
+      const friendStatus = "friend";
+      const findFriends =
+        "SELECT requester_id,receiver_id FROM friends WHERE (requester_id = ? AND status = ?) OR (receiver_id = ? AND status = ?)";
+      const result = await conn.query(findFriends, [
+        id,
+        friendStatus,
+        id,
+        friendStatus,
+      ]);
+      const friendsData = [];
+      // 沒搞清楚這裡的 JOIN 原理
+      // 想一下有沒有更好的寫法
+      for (let i = 0; i < result[0].length; i++) {
+        let targetId = 0;
+        if (result[0][i].requester_id === id) {
+          targetId = result[0][i].receiver_id;
+          const findReqFriendsData =
+            "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.receiver_id WHERE users.id = ?;";
+          const findResult = await conn.query(findReqFriendsData, targetId);
+          friendsData.push(findResult[0][0]);
+          friendsData[i].userId = targetId;
+        } else if (result[0][i].receiver_id === id) {
+          targetId = result[0][i].requester_id;
+          const findReqFriendsData =
+            "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
+          const findResult = await conn.query(findReqFriendsData, targetId);
+          friendsData.push(findResult[0][0]);
+          friendsData[i].userId = targetId;
+        }
+      }
+      return friendsData;
+    } catch (err) {
+      throw errMes.serverError;
+    } finally {
+      await conn.release;
+    }
   },
   pending: async (id) => {
     const conn = await pool.getConnection();
