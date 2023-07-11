@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const errMes = require("../../util/errorMessage");
+const errorMessage = require("../../util/errorMessage");
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -21,7 +22,7 @@ module.exports = {
   friend: () => {
     return "hi";
   },
-  friendPending: async (id) => {
+  pending: async (id) => {
     const conn = await pool.getConnection();
     try {
       const findMyRequester = "SELECT * FROM friends WHERE receiver_id = ?";
@@ -43,7 +44,7 @@ module.exports = {
       await conn.release();
     }
   },
-  friendRequest: async (requesterId, receiverId) => {
+  request: async (requesterId, receiverId) => {
     const conn = await pool.getConnection();
     try {
       const checkStatus =
@@ -74,6 +75,80 @@ module.exports = {
         receiverId,
       ]);
       return result[0][0];
+    } catch (err) {
+      if (err === errMes.clientError) {
+        throw errMes.clientError;
+      } else {
+        throw errMes.serverError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
+  agree: async (uId, fId) => {
+    const conn = await pool.getConnection();
+    try {
+      const newStatus = "friend";
+      const originalStatus = "requested";
+      const findFriendshipById =
+        "SELECT * FROM friends WHERE id = ? AND receiver_id = ? AND status = ?";
+      const findResult = await conn.query(findFriendshipById, [
+        fId,
+        uId,
+        originalStatus,
+      ]);
+      if (findResult[0].length === 0) {
+        throw errMes.clientError;
+      }
+      const updateFriendshipById =
+        "UPDATE friends SET status = ? WHERE id = ? AND receiver_id = ? AND status = ?";
+      await conn.query(updateFriendshipById, [
+        newStatus,
+        fId,
+        uId,
+        originalStatus,
+      ]);
+      return fId;
+    } catch (err) {
+      if (err === errMes.clientError) {
+        throw errMes.clientError;
+      } else {
+        throw errMes.serverError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
+  delete: async (uId, fId) => {
+    const conn = await pool.getConnection();
+    try {
+      const findInvitation =
+        "SELECT * FROM friends WHERE id = ? AND requester_id = ?";
+      const findResult = await conn.query(findInvitation, [fId, uId]);
+      // withdraw invitation
+      if (findResult[0].length > 0) {
+        const withdrawInvitation =
+          "DELETE from friends WHERE id = ? AND requester_id = ?";
+        await conn.query(withdrawInvitation, fId, uId);
+        return fId;
+      } else {
+        const findFriendship =
+          "SELECT * FROM friends WHERE (id = ? AND requester_id = ?) OR (id = ? AND receiver_id= ?)";
+        const findResult = await conn.query(findFriendship, [
+          fId,
+          uId,
+          fId,
+          uId,
+        ]);
+        if (findResult[0].length === 0) {
+          throw errMes.clientError;
+        }
+        // delete friend
+        const deleteFriend =
+          "DELETE FROM friends WHERE (id = ? AND requester_id = ?) OR (id = ? AND receiver_id= ?)";
+        await conn.query(deleteFriend, [fId, uId, fId, uId]);
+        return fId;
+      }
     } catch (err) {
       if (err === errMes.clientError) {
         throw errMes.clientError;

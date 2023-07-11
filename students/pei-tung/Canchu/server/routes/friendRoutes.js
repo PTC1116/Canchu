@@ -5,7 +5,8 @@ const friendUtil = require("../../util/friendUtil");
 const auth = require("../../util/auth");
 
 // router.get("/", auth.auth, friendController.friend);
-router.get("/pending", auth.auth, friendController.friendPending);
-router.post("/:user_id/request", auth.auth, friendController.friendRequest);
-
+router.get("/pending", auth.auth, friendController.pending);
+router.post("/:user_id/request", auth.auth, friendController.request);
+router.post("/:friendship_id/agree", auth.auth, friendController.agree);
+router.delete("/:friendship_id", auth.auth, friendController.delete);
 module.exports = router;
