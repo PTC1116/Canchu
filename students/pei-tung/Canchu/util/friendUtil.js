@@ -5,7 +5,7 @@ module.exports = {
       console.log(arr);
       const { userId, name, picture, id: friendshipId } = arr[i];
       const obj = {
-        userId,
+        id: userId,
         name,
         picture,
         friendship: {
