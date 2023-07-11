@@ -28,7 +28,8 @@ module.exports = {
         "INSERT INTO events (type,created_at,summary,performer_id,recipient_id) VALUES (?,now(),?,?,?)";
       await conn.query(insert, [type, summary, performerId, recipientId]);
     } catch (err) {
-      return errMes.serverError;
+      return err;
+      // return errMes.serverError;
     } finally {
       await conn.release();
     }

@@ -69,7 +69,15 @@ module.exports = {
     try {
       const userId = req.userData.id;
       const friendshipId = req.params.friendship_id * 1;
-      const result = await friendModel.agree(userId, friendshipId);
+      /*const result = await friendModel.agree(userId, friendshipId);*/
+      // send notification
+      // find notification receiverId with friendshipId (which equal to the requesterId in the friends table)
+      const notifReceiverId = await friendModel.findRequesterByFriendshipId(
+        friendshipId
+      );
+      const eventType = "friend_request";
+      const text = "接受了你的好友邀請";
+      await eventModel.send(eventType, text, userId, notifReceiverId);
       const successObj = {
         data: {
           friendship: {
