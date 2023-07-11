@@ -6,15 +6,23 @@ module.exports = {
   friend: (req, res) => {
     res.send(friendModel.friend());
   },
-  friendPending: async (req, res) => {
-    // 回傳：所有寄了交友邀請給我的人
-    const id = req.userData.id;
-    const searchForRequester = await friendModel.friendPending(id);
-    const users = friendUtil.generateUserSearchObj(searchForRequester);
-    const successObj = { data: { users } };
-    return res.status(200).send(successObj);
+  pending: async (req, res) => {
+    try {
+      // 回傳：所有寄了交友邀請給我的人
+      const id = req.userData.id;
+      const searchForRequester = await friendModel.pending(id);
+      const users = friendUtil.generateUserSearchObj(searchForRequester);
+      const successObj = { data: { users } };
+      return res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
   },
-  friendRequest: async (req, res) => {
+  request: async (req, res) => {
     try {
       const receiverId = req.params.user_id * 1;
       const requesterId = req.userData.id;
@@ -22,7 +30,7 @@ module.exports = {
       if (receiverId === requesterId) {
         throw errorMes.clientError;
       }
-      const result = await friendModel.friendRequest(requesterId, receiverId);
+      const result = await friendModel.request(requesterId, receiverId);
       const successRes = {
         data: {
           friendship: {
@@ -31,6 +39,42 @@ module.exports = {
         },
       };
       return res.status(200).send(successRes);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
+  agree: async (req, res) => {
+    try {
+      const userId = req.userData.id;
+      const friendshipId = req.params.friendship_id * 1;
+      const result = await friendModel.agree(userId, friendshipId);
+      const successObj = {
+        data: {
+          friendship: {
+            id: result,
+          },
+        },
+      };
+      return res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
+  delete: async (req, res) => {
+    try {
+      const friendshipId = req.params.friendship_id * 1;
+      const userId = req.userData.id;
+      const result = await friendModel.delete(userId, friendshipId);
+      const successObj = { data: { friendship: { id: result } } };
+      return res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {
         return res.status(err.status).send({ error: err.error });
