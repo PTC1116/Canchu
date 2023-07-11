@@ -3,15 +3,31 @@ const friendUtil = require("../../util/friendUtil");
 const friendModel = require("../models/friendModel");
 
 module.exports = {
-  friend: (req, res) => {
-    res.send(friendModel.friend());
+  showAllFriends: async (req, res) => {
+    // res.send(friendModel.friend());
+    try {
+      const id = req.userData.id;
+      const result = await friendModel.showAllFriends(id);
+      const users = friendUtil.generateUserSearchObj(result, "friend");
+      const successObj = { data: { users } };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
   },
   pending: async (req, res) => {
     try {
       // 回傳：所有寄了交友邀請給我的人
       const id = req.userData.id;
       const searchForRequester = await friendModel.pending(id);
-      const users = friendUtil.generateUserSearchObj(searchForRequester);
+      const users = friendUtil.generateUserSearchObj(
+        searchForRequester,
+        "pending"
+      );
       const successObj = { data: { users } };
       return res.status(200).send(successObj);
     } catch (err) {
