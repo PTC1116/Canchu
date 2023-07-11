@@ -10,7 +10,7 @@ module.exports = {
     try {
       // 回傳：所有寄了交友邀請給我的人
       const id = req.userData.id;
-      const searchForRequester = await friendModel.friendPending(id);
+      const searchForRequester = await friendModel.pending(id);
       const users = friendUtil.generateUserSearchObj(searchForRequester);
       const successObj = { data: { users } };
       return res.status(200).send(successObj);
@@ -30,7 +30,7 @@ module.exports = {
       if (receiverId === requesterId) {
         throw errorMes.clientError;
       }
-      const result = await friendModel.friendRequest(requesterId, receiverId);
+      const result = await friendModel.request(requesterId, receiverId);
       const successRes = {
         data: {
           friendship: {
@@ -51,7 +51,7 @@ module.exports = {
     try {
       const userId = req.userData.id;
       const friendshipId = req.params.friendship_id;
-      const result = await friendModel.friendAgree(userId, friendshipId);
+      const result = await friendModel.agree(userId, friendshipId);
       const successObj = {
         data: {
           friendship: {
