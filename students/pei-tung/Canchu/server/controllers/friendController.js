@@ -1,10 +1,9 @@
 const errorMes = require("../../util/errorMessage");
 const friendUtil = require("../../util/friendUtil");
 const friendModel = require("../models/friendModel");
-
+const eventModel = require("../models/eventModel");
 module.exports = {
   showAllFriends: async (req, res) => {
-    // res.send(friendModel.friend());
     try {
       const id = req.userData.id;
       const result = await friendModel.showAllFriends(id);
@@ -21,7 +20,6 @@ module.exports = {
   },
   pending: async (req, res) => {
     try {
-      // 回傳：所有寄了交友邀請給我的人
       const id = req.userData.id;
       const searchForRequester = await friendModel.pending(id);
       const users = friendUtil.generateUserSearchObj(
@@ -47,6 +45,10 @@ module.exports = {
         throw errorMes.clientError;
       }
       const result = await friendModel.request(requesterId, receiverId);
+      // send notification
+      const eventType = "friend_request";
+      const text = "邀請你成為好友";
+      await eventModel.send(eventType, text, requesterId, receiverId);
       const successRes = {
         data: {
           friendship: {
