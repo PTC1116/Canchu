@@ -50,7 +50,7 @@ module.exports = {
   agree: async (req, res) => {
     try {
       const userId = req.userData.id;
-      const friendshipId = req.params.friendship_id;
+      const friendshipId = req.params.friendship_id * 1;
       const result = await friendModel.agree(userId, friendshipId);
       const successObj = {
         data: {
@@ -70,7 +70,7 @@ module.exports = {
   },
   delete: async (req, res) => {
     try {
-      const friendshipId = req.params.friendship_id;
+      const friendshipId = req.params.friendship_id * 1;
       const userId = req.userData.id;
       const result = await friendModel.delete(userId, friendshipId);
       const successObj = { data: { friendship: { id: result } } };

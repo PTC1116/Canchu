@@ -122,25 +122,34 @@ module.exports = {
   delete: async (uId, fId) => {
     const conn = await pool.getConnection();
     try {
+      const invitationStatus = "requested";
       const findInvitation =
-        "SELECT * FROM friends WHERE id = ? AND requester_id = ?";
-      const findResult = await conn.query(findInvitation, [fId, uId]);
+        "SELECT * FROM friends WHERE id = ? AND requester_id = ? AND status = ?";
+      const findResult = await conn.query(findInvitation, [
+        fId,
+        uId,
+        invitationStatus,
+      ]);
       // withdraw invitation
       if (findResult[0].length > 0) {
         const withdrawInvitation =
-          "DELETE from friends WHERE id = ? AND requester_id = ?";
-        await conn.query(withdrawInvitation, fId, uId);
+          "DELETE from friends WHERE id = ? AND requester_id = ? AND status = ?";
+        const a = await conn.query(withdrawInvitation, [
+          fId,
+          uId,
+          invitationStatus,
+        ]);
         return fId;
       } else {
         const findFriendship =
           "SELECT * FROM friends WHERE (id = ? AND requester_id = ?) OR (id = ? AND receiver_id= ?)";
-        const findResult = await conn.query(findFriendship, [
+        const findFriendshipResult = await conn.query(findFriendship, [
           fId,
           uId,
           fId,
           uId,
         ]);
-        if (findResult[0].length === 0) {
+        if (findFriendshipResult[0].length === 0) {
           throw errMes.clientError;
         }
         // delete friend
@@ -153,7 +162,7 @@ module.exports = {
       if (err === errMes.clientError) {
         throw errMes.clientError;
       } else {
-        throw errMes.serverError;
+        throw err;
       }
     } finally {
       await conn.release();
