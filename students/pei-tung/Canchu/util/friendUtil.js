@@ -2,9 +2,10 @@ module.exports = {
   generateUserSearchObj: (arr) => {
     const users = [];
     for (i = 0; i < arr.length; i++) {
-      const { id, name, picture, ID: friendshipId } = arr[i];
+      console.log(arr);
+      const { userId, name, picture, id: friendshipId } = arr[i];
       const obj = {
-        id,
+        userId,
         name,
         picture,
         friendship: {

@@ -24,15 +24,17 @@ module.exports = {
   friendPending: async (id) => {
     const conn = await pool.getConnection();
     try {
-      const findMyRequester = "SELECT * FROM friends WHERE receiverID = ?";
+      const findMyRequester = "SELECT * FROM friends WHERE receiver_id = ?";
       const requesterId = await conn.query(findMyRequester, [id]);
       const requesterData = [];
       for (let i = 0; i < requesterId[0].length; i++) {
-        const targetId = requesterId[0][i].requesterID;
+        const targetId = requesterId[0][i].requester_id;
+        // 要再想想 DISTINCT 是否是必要的
         const findRequesterData =
-          "SELECT DISTINCT users.id, name, picture,friends.ID FROM users INNER JOIN friends ON users.id = friends.requesterID WHERE users.id = ?;";
+          "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
         const result = await conn.query(findRequesterData, targetId);
         requesterData.push(result[0][0]);
+        requesterData[i].userId = targetId;
       }
       return requesterData;
     } catch (err) {
@@ -45,7 +47,7 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const checkStatus =
-        "SELECT * FROM friends WHERE requesterID = ? AND receiverID = ?";
+        "SELECT * FROM friends WHERE requester_id = ? AND receiver_id = ?";
       const requesterResult = await conn.query(checkStatus, [
         requesterId,
         receiverId,
@@ -59,14 +61,14 @@ module.exports = {
       }
       const status = "requested";
       const insert =
-        "INSERT INTO friends (requesterID, receiverID, status) VALUES(?,?,?)";
+        "INSERT INTO friends (requester_id, receiver_id, status) VALUES(?,?,?)";
       const insertResult = await conn.query(insert, [
         requesterId,
         receiverId,
         status,
       ]);
       const findFriendshipId =
-        "SELECT ID FROM friends WHERE requesterID = ? AND receiverID = ?";
+        "SELECT ID FROM friends WHERE requester_id = ? AND receiver_id = ?";
       const result = await conn.query(findFriendshipId, [
         requesterId,
         receiverId,
