@@ -167,7 +167,9 @@ module.exports = {
       const searchFor = req.query.keyword;
       const searchResult = await userModel.search(myId, searchFor);
       const users = userUtil.generateUserSearchObj(searchResult);
+      // console.log(users);
       const successObj = { data: { users } };
+      // console.log(successObj);
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {

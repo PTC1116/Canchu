@@ -136,7 +136,6 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       // Find target users
-      const findId = "SELECT id FROM users WHERE name like ?";
       const keywordStr = `%${keyword}%`;
       const findRelationship = `SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
       FROM users
@@ -158,7 +157,7 @@ module.exports = {
           result[0][i].receiver_id === myId &&
           result[0][i].status === "requested"
         ) {
-          result[0][i].status = pending;
+          result[0][i].status = "pending";
         }
       }
       return result[0];
