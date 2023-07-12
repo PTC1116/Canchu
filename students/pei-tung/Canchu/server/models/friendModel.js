@@ -1,6 +1,5 @@
 const mysql = require("mysql2");
 const errMes = require("../../util/errorMessage");
-const errorMessage = require("../../util/errorMessage");
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -201,6 +200,18 @@ module.exports = {
       } else {
         throw err;
       }
+    } finally {
+      await conn.release();
+    }
+  },
+  findRequesterByFriendshipId: async (friendshipId) => {
+    const conn = await pool.getConnection();
+    try {
+      const query = "SELECT requester_id FROM friends WHERE id = ?";
+      const result = await conn.query(query, [friendshipId]);
+      return result[0][0].requester_id;
+    } catch (err) {
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }

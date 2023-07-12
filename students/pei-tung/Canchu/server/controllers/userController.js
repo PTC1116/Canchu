@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
 const axios = require("axios");
-const multer = require("multer");
 const errMes = require("../../util/errorMessage");
 
 module.exports = {
