@@ -29,12 +29,7 @@ module.exports = {
       }
       const insertDataQuery =
         "INSERT INTO users (name, email, password, provider) VALUES (?,?,?,?)";
-      const insertDataResult = await conn.query(insertDataQuery, [
-        name,
-        email,
-        password,
-        provider,
-      ]);
+      await conn.query(insertDataQuery, [name, email, password, provider]);
       const getUserByEmail = "SELECT * FROM users WHERE email = ?";
       const result = await conn.query(getUserByEmail, [email]);
       return result[0][0];
