@@ -69,7 +69,7 @@ module.exports = {
     try {
       const userId = req.userData.id;
       const friendshipId = req.params.friendship_id * 1;
-      /*const result = await friendModel.agree(userId, friendshipId);*/
+      const result = await friendModel.agree(userId, friendshipId);
       // send notification
       // find notification receiverId with friendshipId (which equal to the requesterId in the friends table)
       const notifReceiverId = await friendModel.findRequesterByFriendshipId(
