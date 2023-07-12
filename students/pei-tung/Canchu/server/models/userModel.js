@@ -139,13 +139,22 @@ module.exports = {
       const keywordStr = `%${keyword}%`;
       const findRelationship = `SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
       FROM users
-      INNER JOIN friends ON users.id = friends.receiver_id
+      LEFT JOIN friends ON users.id = friends.receiver_id
       WHERE name like ? AND requester_id = ?
       UNION
       SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status
       FROM users
-      INNER JOIN friends ON users.id = friends.requester_id
+      LEFT JOIN friends ON users.id = friends.requester_id
       WHERE name like ? AND receiver_id = ?;`;
+      /*SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
+      FROM users
+      LEFT JOIN friends ON users.id = friends.receiver_id
+      WHERE name like "%user-iizctJNk%" AND requester_id = 73
+      UNION
+      SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status
+      FROM users
+      LEFT JOIN friends ON users.id = friends.requester_id
+      WHERE name like "%user-iizctJNk%" AND receiver_id = 73*/
       const result = await conn.query(findRelationship, [
         keywordStr,
         myId,
