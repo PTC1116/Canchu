@@ -161,4 +161,20 @@ module.exports = {
       }
     }
   },
+  search: async (req, res) => {
+    try {
+      const myId = req.userData.id;
+      const searchFor = req.query.keyword;
+      const searchResult = await userModel.search(myId, searchFor);
+      const users = userUtil.generateUserSearchObj(searchResult);
+      const successObj = { data: { users } };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
 };

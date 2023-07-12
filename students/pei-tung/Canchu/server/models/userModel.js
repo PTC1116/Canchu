@@ -132,6 +132,42 @@ module.exports = {
       await conn.release();
     }
   },
+  search: async (myId, keyword) => {
+    const conn = await pool.getConnection();
+    try {
+      // Find target users
+      const findId = "SELECT id FROM users WHERE name like ?";
+      const keywordStr = `%${keyword}%`;
+      const findRelationship = `SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
+      FROM users
+      INNER JOIN friends ON users.id = friends.receiver_id
+      WHERE name like ? AND requester_id = ?
+      UNION
+      SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status
+      FROM users
+      INNER JOIN friends ON users.id = friends.requester_id
+      WHERE name like ? AND receiver_id = ?;`;
+      const result = await conn.query(findRelationship, [
+        keywordStr,
+        myId,
+        keywordStr,
+        myId,
+      ]);
+      for (i = 0; i < result[0].length; i++) {
+        if (
+          result[0][i].receiver_id === myId &&
+          result[0][i].status === "requested"
+        ) {
+          result[0][i].status = pending;
+        }
+      }
+      return result[0];
+    } catch (err) {
+      throw err;
+    } finally {
+      await conn.release();
+    }
+  },
 };
 
 // 也可以 module.exports{ a: function()=>{}, b:function() => {module.exports.a()}}

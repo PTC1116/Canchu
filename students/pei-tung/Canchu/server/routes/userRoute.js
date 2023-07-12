@@ -14,5 +14,6 @@ router.put(
   userUtil.pictureUploadSetting().single("picture"),
   userController.userPictureUpdate
 );
+router.get("/search", auth.auth, userController.search);
 
 module.exports = router;

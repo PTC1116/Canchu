@@ -22,6 +22,7 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = "friend";
+      // 從資料庫中撈出所有 requester_id 或是 receiver_id 包含「我的id」的資料
       const findFriends =
         "SELECT requester_id,receiver_id FROM friends WHERE (requester_id = ? AND status = ?) OR (receiver_id = ? AND status = ?)";
       const result = await conn.query(findFriends, [
@@ -34,18 +35,20 @@ module.exports = {
       // 沒搞清楚這裡的 JOIN 原理
       // 想一下有沒有更好的寫法
       for (let i = 0; i < result[0].length; i++) {
+        // 如果 requester_id = 我的 id，搜尋 receiver_id 在 users 表中的資料
         let targetId = 0;
         if (result[0][i].requester_id === id) {
           targetId = result[0][i].receiver_id;
           const findReqFriendsData =
-            "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.receiver_id WHERE users.id = ?;";
+            "SELECT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.receiver_id WHERE users.id = ?;";
           const findResult = await conn.query(findReqFriendsData, targetId);
           friendsData.push(findResult[0][0]);
           friendsData[i].userId = targetId;
         } else if (result[0][i].receiver_id === id) {
+          // 如果 receiver_id = 我的 id，搜尋 requester_id 在 users 表中的資料
           targetId = result[0][i].requester_id;
           const findReqFriendsData =
-            "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
+            "SELECT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
           const findResult = await conn.query(findReqFriendsData, targetId);
           friendsData.push(findResult[0][0]);
           friendsData[i].userId = targetId;
