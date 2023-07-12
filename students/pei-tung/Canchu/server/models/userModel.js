@@ -152,8 +152,8 @@ module.exports = {
         keywordStr,
         myId,
       ]);
-      if (result[0].length === 0) {
-        throw errMes.serverError;
+      if (result.length === 0) {
+        return [];
       }
       for (i = 0; i < result[0].length; i++) {
         if (
