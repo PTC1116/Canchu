@@ -152,12 +152,12 @@ module.exports = {
         keywordStr,
         myId,
       ]);
-      console.log(result[0].length);
+      console.log("result length :", result[0].length);
       if (result[0].length === 0) {
         return [];
       }
       for (let i = 0; i < result[0].length; i++) {
-        console.log("hi");
+        console.log("for loop");
         if (
           result[0][i].receiver_id === myId &&
           result[0][i].status === "requested"
