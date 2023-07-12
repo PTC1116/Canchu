@@ -25,6 +25,9 @@ module.exports = {
     return upload;
   },
   generateUserSearchObj: (arr) => {
+    if (arr.length === 0) {
+      return [];
+    }
     const users = [];
     arr.forEach((el) => {
       const { userId, name, picture, id, status } = el;
