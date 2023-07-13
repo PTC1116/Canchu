@@ -24,4 +24,33 @@ module.exports = {
     const upload = multer({ storage });
     return upload;
   },
+  generateUserSearchObj: (arr) => {
+    if (arr.length === 0) {
+      return;
+    }
+
+    console.log("check generateUserSearchObj");
+    const users = [];
+    arr.forEach((el) => {
+      const { userId, name, picture, id, status } = el;
+      let obj = {};
+      if (id === null) {
+        obj = {
+          id: userId,
+          name,
+          picture,
+          friendship: null,
+        };
+      } else {
+        obj = {
+          id: userId,
+          name,
+          picture,
+          friendship: { id, status },
+        };
+      }
+      users.push(obj);
+    });
+    return users;
+  },
 };
