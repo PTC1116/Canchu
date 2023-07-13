@@ -22,39 +22,20 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = "friend";
-      // 從資料庫中撈出所有 requester_id 或是 receiver_id 包含「我的id」的資料
-      const findFriends =
-        "SELECT requester_id,receiver_id FROM friends WHERE (requester_id = ? AND status = ?) OR (receiver_id = ? AND status = ?)";
+      const findFriends = `SELECT users.id AS userId, name, picture, friends.id AS friendId FROM users 
+      INNER JOIN friends ON users.id = friends.receiver_id 
+      WHERE requester_id = ? AND status = ? 
+      UNION
+      SELECT users.id AS userId, name, picture, friends.id AS friendId FROM users 
+      INNER JOIN friends ON users.id = friends.requester_id 
+      WHERE receiver_id = ? AND status = ?`;
       const result = await conn.query(findFriends, [
         id,
         friendStatus,
         id,
         friendStatus,
       ]);
-      const friendsData = [];
-      // 沒搞清楚這裡的 JOIN 原理
-      // 想一下有沒有更好的寫法
-      for (let i = 0; i < result[0].length; i++) {
-        // 如果 requester_id = 我的 id，搜尋 receiver_id 在 users 表中的資料
-        let targetId = 0;
-        if (result[0][i].requester_id === id) {
-          targetId = result[0][i].receiver_id;
-          const findReqFriendsData =
-            "SELECT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.receiver_id WHERE users.id = ?;";
-          const findResult = await conn.query(findReqFriendsData, targetId);
-          friendsData.push(findResult[0][0]);
-          friendsData[i].userId = targetId;
-        } else if (result[0][i].receiver_id === id) {
-          // 如果 receiver_id = 我的 id，搜尋 requester_id 在 users 表中的資料
-          targetId = result[0][i].requester_id;
-          const findReqFriendsData =
-            "SELECT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
-          const findResult = await conn.query(findReqFriendsData, targetId);
-          friendsData.push(findResult[0][0]);
-          friendsData[i].userId = targetId;
-        }
-      }
-      return friendsData;
+      return result[0];
     } catch (err) {
       throw errMes.serverError;
     } finally {
@@ -64,19 +45,12 @@ module.exports = {
   pending: async (id) => {
     const conn = await pool.getConnection();
     try {
-      const findMyRequester = "SELECT * FROM friends WHERE receiver_id = ?";
-      const requesterId = await conn.query(findMyRequester, [id]);
-      const requesterData = [];
-      for (let i = 0; i < requesterId[0].length; i++) {
-        const targetId = requesterId[0][i].requester_id;
-        // 要再想想 DISTINCT 是否是必要的
-        const findRequesterData =
-          "SELECT DISTINCT name, picture, friends.id FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE users.id = ?;";
-        const result = await conn.query(findRequesterData, targetId);
-        requesterData.push(result[0][0]);
-        requesterData[i].userId = targetId;
-      }
-      return requesterData;
+      // pending 的條件：status = "requested" && receiver_id = myId
+      const status = "requested";
+      const findPendingList =
+        "SELECT users.id AS userId, name, picture, friends.id AS friendId FROM users INNER JOIN friends ON users.id = friends.requester_id WHERE friends.receiver_id = ? AND status = ?;";
+      const pendingList = await conn.query(findPendingList, [id, status]);
+      return pendingList[0];
     } catch (err) {
       console.log(err);
     } finally {
