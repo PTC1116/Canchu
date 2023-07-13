@@ -32,4 +32,19 @@ module.exports = {
       }
     }
   },
+  createLike: async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.userData.id;
+      const result = await model.createLike(userId, postId);
+      const successObj = { data: { post: { id: result } } };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
 };

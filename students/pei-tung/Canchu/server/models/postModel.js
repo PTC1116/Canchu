@@ -25,7 +25,7 @@ module.exports = {
       const result = await conn.query(insertData, [id, context]);
       return result[0].insertId;
     } catch (err) {
-      throw err;
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
@@ -38,7 +38,19 @@ module.exports = {
       const result = await conn.query(updateData, [context, postId, userId]);
       return postId;
     } catch (err) {
-      console.log(err);
+      throw errMes.serverError;
+    } finally {
+      await conn.release();
+    }
+  },
+  createLike: async (userId, postId) => {
+    const conn = await pool.getConnection();
+    try {
+      const insertData = "INSERT INTO likes(like_user,post_id) VALUES (?,?)";
+      const result = conn.query(insertData, [userId, postId]);
+      return postId;
+    } catch (err) {
+      throw errMes.serverError;
     } finally {
       await conn.release();
     }
