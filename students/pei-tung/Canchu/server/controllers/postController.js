@@ -69,4 +69,22 @@ module.exports = {
       }
     }
   },
+  createComment: async (req, res) => {
+    try {
+      const userId = req.userData.id;
+      const postId = req.params.id * 1;
+      const content = req.body.content;
+      const result = await model.createComment(userId, postId, content);
+      const successObj = {
+        data: { post: { id: postId }, comment: { id: result } },
+      };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
 };

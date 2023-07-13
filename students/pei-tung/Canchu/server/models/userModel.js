@@ -154,7 +154,6 @@ module.exports = {
         ) {
           result[0][i].id = null;
           result[0][i].status = null;
-          console.log(result[0][i]);
         }
         if (
           result[0][i].receiver_id === myId &&
