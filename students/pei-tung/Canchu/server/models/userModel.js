@@ -137,36 +137,29 @@ module.exports = {
     try {
       // Find target users
       const keywordStr = `%${keyword}%`;
-      const findRelationship = `SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
+      const findUsers = `SELECT users.id AS userId, name, picture, friends.id, friends.requester_id, friends.receiver_id, friends.status
       FROM users
       LEFT JOIN friends ON users.id = friends.receiver_id
-      WHERE name like ? AND requester_id = ?
-      UNION
-      SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status
-      FROM users
-      LEFT JOIN friends ON users.id = friends.requester_id
-      WHERE name like ? AND receiver_id = ?;`;
-      /*SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status 
-      FROM users
-      LEFT JOIN friends ON users.id = friends.receiver_id
-      WHERE name like "%user-iizctJNk%" AND requester_id = 73
-      UNION
-      SELECT users.id AS userId, name, picture, friends.id, friends.receiver_id, friends.status
-      FROM users
-      LEFT JOIN friends ON users.id = friends.requester_id
-      WHERE name like "%user-iizctJNk%" AND receiver_id = 73*/
-      const result = await conn.query(findRelationship, [
-        keywordStr,
-        myId,
-        keywordStr,
-        myId,
-      ]);
+      WHERE name like ? ;`;
+
+      const result = await conn.query(findUsers, [keywordStr]);
+
+      console.log("list:", result[0]);
       console.log("result length :", result[0].length);
       if (result[0].length === 0) {
         return [];
       }
       for (let i = 0; i < result[0].length; i++) {
         console.log("for loop");
+        if (
+          result[0][i].receiver_id !== myId &&
+          result[0][i].requester_id !== myId
+        ) {
+          console.log("null");
+          result[0][i].id = null;
+          result[0][i].status = null;
+          console.log(result[0][i]);
+        }
         if (
           result[0][i].receiver_id === myId &&
           result[0][i].status === "requested"
