@@ -144,18 +144,14 @@ module.exports = {
 
       const result = await conn.query(findUsers, [keywordStr]);
 
-      console.log("list:", result[0]);
-      console.log("result length :", result[0].length);
       if (result[0].length === 0) {
         return [];
       }
       for (let i = 0; i < result[0].length; i++) {
-        console.log("for loop");
         if (
           result[0][i].receiver_id !== myId &&
           result[0][i].requester_id !== myId
         ) {
-          console.log("null");
           result[0][i].id = null;
           result[0][i].status = null;
           console.log(result[0][i]);
