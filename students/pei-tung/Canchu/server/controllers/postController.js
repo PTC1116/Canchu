@@ -107,7 +107,7 @@ module.exports = {
       const targetId = req.query.user_id;
       const cursorStr = req.query.cursor;
       const myId = req.userData.id;
-      const itemsPerPage = 3;
+      const itemsPerPage = 10;
       let nextCursor;
       let result;
       if (cursorStr && targetId) {
