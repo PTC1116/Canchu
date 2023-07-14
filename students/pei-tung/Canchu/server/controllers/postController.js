@@ -137,9 +137,13 @@ module.exports = {
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getMyTimeline(myId);
       }
-      console.log(nextCursor);
       const posts = util.generatePostSearchObj(result);
-      const successObj = { data: { posts, next_cursor: nextCursor } };
+      let successObj;
+      if (posts.length < itemsPerPage) {
+        successObj = { data: { posts } };
+      } else {
+        successObj = { data: { posts, next_cursor: nextCursor } };
+      }
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {

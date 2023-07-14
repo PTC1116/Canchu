@@ -14,6 +14,11 @@ module.exports = {
         picture,
         name,
       } = arr[i];
+      if (arr[i].is_liked == 0) {
+        arr[i].is_liked = false;
+      } else {
+        arr[i].is_liked = true;
+      }
       const obj = {
         id,
         user_id,
@@ -27,7 +32,6 @@ module.exports = {
       };
       posts.push(obj);
     }
-    // console.log(posts);
     return posts;
   },
 };
