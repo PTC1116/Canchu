@@ -302,7 +302,7 @@ module.exports = {
           LEFT JOIN comments ON posts.id = comments.post
           LEFT JOIN likes ON posts.id = likes.post
           WHERE users.id = ?
-          LIMIT = ?
+          LIMIT ?
       ;`;
         const publicUserTimeline = await conn.query(getTimelineByUserId, [
           id,
