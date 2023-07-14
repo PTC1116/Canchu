@@ -125,4 +125,78 @@ module.exports = {
       await conn.release();
     }
   },
+  getPostDetail: async (id) => {
+    const conn = await pool.getConnection();
+    try {
+      // 確認該貼文是否存在
+      const findTargetPost = "SELECT * FROM posts WHERE id = ?";
+      const findResult = await conn.query(findTargetPost, [id]);
+      if (findResult[0].length === 0) {
+        throw errMes.clientError;
+      }
+      let result = {};
+      const findPostOwner = `SELECT posts.id AS postId, posts.created_at, posts.context, users.picture, users.name 
+      FROM users
+      INNER JOIN posts ON users.id = posts.posted_by
+      WHERE posts.id = ?`;
+      const postOwnerData = await conn.query(findPostOwner, [id]);
+      const countLike =
+        "SELECT COUNT(*) AS totalLike FROM likes WHERE post = ?";
+      const totalLike = await conn.query(countLike, [id]);
+      const like_count = totalLike[0][0].totalLike;
+      let is_liked = false;
+      if (like_count > 0) {
+        is_liked = true;
+      }
+      const countCmt =
+        "SELECT COUNT (*) AS totalCmt FROM comments WHERE post = ?";
+      const totalCmt = await conn.query(countCmt, [id]);
+      const comment_count = totalCmt[0][0].totalCmt;
+      result = {
+        post: {
+          id: postOwnerData[0][0].postId,
+          created_at: postOwnerData[0][0].created_at,
+          context: postOwnerData[0][0].context,
+          is_liked,
+          like_count,
+          comment_count,
+          picture: postOwnerData[0][0].picture,
+          name: postOwnerData[0][0].name,
+          comments: [],
+        },
+      };
+      if (comment_count === 0) {
+        result.post.comments = null;
+        return result;
+      }
+      const findCmtAuthor = `SELECT comments.id AS cmtId, comments.created_at, comments.content, users.id AS userId, users.name, users.picture
+      FROM users
+      INNER JOIN comments
+      ON users.id = comments.author
+      WHERE comments.post = ?`;
+      const cmtAuthorData = await conn.query(findCmtAuthor, [id]);
+      // result.post.comments = [];
+      for (let i = 0; i < cmtAuthorData[0].length; i++) {
+        const { cmtId, created_at, content, userId, name, picture } =
+          cmtAuthorData[0][i];
+        const obj = {
+          id: cmtId,
+          created_at,
+          content,
+          user: { id: userId, name, picture },
+        };
+        result.post.comments.push(obj);
+      }
+      return result;
+    } catch (err) {
+      if (err === errMes.clientError) {
+        throw errMes.clientError;
+      } else {
+        console.log(err);
+        throw errMes.serverError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
 };

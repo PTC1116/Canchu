@@ -8,5 +8,6 @@ router.put("/:id", auth.auth, controller.postUpdated);
 router.post("/:id/like", auth.auth, controller.createLike);
 router.delete("/:id/like", auth.auth, controller.deleteLike);
 router.post("/:id/comment", auth.auth, controller.createComment);
+router.get("/:id", auth.auth, controller.getPostDetail);
 
 module.exports = router;

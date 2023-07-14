@@ -87,4 +87,18 @@ module.exports = {
       }
     }
   },
+  getPostDetail: async (req, res) => {
+    try {
+      const postId = req.params.id * 1;
+      const result = await model.getPostDetail(postId);
+      const successObj = { data: result };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
 };
