@@ -131,11 +131,11 @@ module.exports = {
       } else if (!cursorStr && targetId) {
         const nextPageIndex = itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getTimelineByUserId(targetId);
+        result = await model.getTimelineByUserId(targetId, itemsPerPage);
       } else if (!cursorStr && !targetId) {
         const nextPageIndex = itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId);
+        result = await model.getMyTimeline(myId, itemsPerPage);
       }
       const posts = util.generatePostSearchObj(result);
       let successObj;
