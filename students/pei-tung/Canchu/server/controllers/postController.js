@@ -118,8 +118,8 @@ module.exports = {
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getTimelineByUserId(
           targetId,
-          decodedCursor,
-          itemsPerPage
+          itemsPerPage,
+          decodedCursor
         );
       } else if (cursorStr && !targetId) {
         const decodedCursor = Buffer.from(cursorStr, "base64").toString(
@@ -127,7 +127,7 @@ module.exports = {
         );
         const nextPageIndex = decodedCursor * 1 + itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId, decodedCursor, itemsPerPage);
+        result = await model.getMyTimeline(myId, itemsPerPage, decodedCursor);
       } else if (!cursorStr && targetId) {
         const nextPageIndex = itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");

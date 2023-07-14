@@ -199,9 +199,8 @@ module.exports = {
       await conn.release();
     }
   },
-  getMyTimeline: async (id, cursor, itemsPerPage) => {
+  getMyTimeline: async (id, itemsPerPage, cursor) => {
     const conn = await pool.getConnection();
-    console.log(cursor);
     try {
       const friendStatus = "friend";
       let getMyTimeline;
@@ -225,7 +224,17 @@ module.exports = {
         ) AS my_friend_and_I
         ON my_friend_and_I.id = users.id
         LEFT JOIN comments ON posts.id = comments.post
-        LEFT JOIN likes ON posts.id = likes.post`;
+        LEFT JOIN likes ON posts.id = likes.post
+        LIMIT ?;`;
+        const myTimeline = await conn.query(getMyTimeline, [
+          id,
+          friendStatus,
+          id,
+          friendStatus,
+          id,
+          itemsPerPage,
+        ]);
+        return myTimeline[0];
       } else {
         getMyTimeline = `SELECT * FROM
       (
@@ -277,7 +286,7 @@ module.exports = {
       await conn.release();
     }
   },
-  getTimelineByUserId: async (id, cursor, itemsPerPage) => {
+  getTimelineByUserId: async (id, itemsPerPage, cursor) => {
     const conn = await pool.getConnection();
     try {
       const checkUserExistence = "SELECT id FROM users WHERE id = ?";
@@ -293,7 +302,13 @@ module.exports = {
           LEFT JOIN comments ON posts.id = comments.post
           LEFT JOIN likes ON posts.id = likes.post
           WHERE users.id = ?
+          LIMIT = ?
       ;`;
+        const publicUserTimeline = await conn.query(getTimelineByUserId, [
+          id,
+          itemsPerPage,
+        ]);
+        return publicUserTimeline[0];
       } else {
         getTimelineByUserId = `SELECT * FROM
       (SELECT *, ROW_NUMBER() OVER (ORDER BY user_post.id DESC) as row_num
