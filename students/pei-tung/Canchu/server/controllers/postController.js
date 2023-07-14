@@ -114,7 +114,7 @@ module.exports = {
         const decodedCursor = Buffer.from(cursorStr, "base64").toString(
           "utf-8"
         );
-        const nextPageIndex = decodedCursor * 1 + 3;
+        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getTimelineByUserId(
           targetId,
@@ -125,17 +125,21 @@ module.exports = {
         const decodedCursor = Buffer.from(cursorStr, "base64").toString(
           "utf-8"
         );
-        const nextPageIndex = decodedCursor * 1 + 3;
+        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getMyTimeline(myId, decodedCursor, itemsPerPage);
       } else if (!cursorStr && targetId) {
+        const nextPageIndex = itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getTimelineByUserId(targetId);
-      } else {
+      } else if (!cursorStr && !targetId) {
+        const nextPageIndex = itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getMyTimeline(myId);
       }
+      console.log(nextCursor);
       const posts = util.generatePostSearchObj(result);
-      const successObj = { data: { posts } };
-      successObj.next_cursor = nextCursor;
+      const successObj = { data: { post, next_cursor: nextCursors } };
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {
