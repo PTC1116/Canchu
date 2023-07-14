@@ -140,7 +140,7 @@ module.exports = {
       const posts = util.generatePostSearchObj(result);
       let successObj;
       if (posts.length < itemsPerPage) {
-        successObj = { data: { posts } };
+        successObj = { data: { posts, next_cursor: null } };
       } else {
         successObj = { data: { posts, next_cursor: nextCursor } };
       }
