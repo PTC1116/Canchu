@@ -139,7 +139,7 @@ module.exports = {
       }
       console.log(nextCursor);
       const posts = util.generatePostSearchObj(result);
-      const successObj = { data: { post, next_cursor: nextCursors } };
+      const successObj = { data: { posts, next_cursor: nextCursor } };
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {
