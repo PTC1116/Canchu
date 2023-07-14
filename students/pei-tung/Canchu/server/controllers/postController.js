@@ -1,5 +1,6 @@
 const model = require("../models/postModel");
 const errMes = require("../../util/errorMessage");
+const util = require("../../util/postUtil");
 
 module.exports = {
   post: async (req, res) => {
@@ -92,6 +93,49 @@ module.exports = {
       const postId = req.params.id * 1;
       const result = await model.getPostDetail(postId);
       const successObj = { data: result };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
+  search: async (req, res) => {
+    try {
+      const targetId = req.query.user_id;
+      const cursorStr = req.query.cursor;
+      const myId = req.userData.id;
+      const itemsPerPage = 3;
+      let nextCursor;
+      let result;
+      if (cursorStr && targetId) {
+        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
+          "utf-8"
+        );
+        const nextPageIndex = decodedCursor * 1 + 3;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getTimelineByUserId(
+          targetId,
+          decodedCursor,
+          itemsPerPage
+        );
+      } else if (cursorStr && !targetId) {
+        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
+          "utf-8"
+        );
+        const nextPageIndex = decodedCursor * 1 + 3;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getMyTimeline(myId, decodedCursor, itemsPerPage);
+      } else if (!cursorStr && targetId) {
+        result = await model.getTimelineByUserId(targetId);
+      } else {
+        result = await model.getMyTimeline(myId);
+      }
+      const posts = util.generatePostSearchObj(result);
+      const successObj = { data: { posts } };
+      successObj.next_cursor = nextCursor;
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {

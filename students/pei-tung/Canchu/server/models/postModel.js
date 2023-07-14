@@ -199,4 +199,131 @@ module.exports = {
       await conn.release();
     }
   },
+  getMyTimeline: async (id, cursor, itemsPerPage) => {
+    const conn = await pool.getConnection();
+    console.log(cursor);
+    try {
+      const friendStatus = "friend";
+      let getMyTimeline;
+      if (!cursor) {
+        console.log("nocursor");
+        getMyTimeline = `SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
+        FROM posts 
+        LEFT JOIN users ON posts.posted_by = users.id 
+        INNER JOIN 
+        (
+            SELECT users.id FROM users 
+            INNER JOIN friends ON users.id = friends.receiver_id 
+            WHERE friends.requester_id = ? AND friends.status = ?
+            UNION
+            SELECT users.id FROM users 
+            INNER JOIN friends ON users.id = friends.requester_id 
+            WHERE friends.receiver_id = ? AND friends.status = ?
+            UNION
+            SELECT users.id FROM users
+            WHERE users.id = ?
+        ) AS my_friend_and_I
+        ON my_friend_and_I.id = users.id
+        LEFT JOIN comments ON posts.id = comments.post
+        LEFT JOIN likes ON posts.id = likes.post`;
+      } else {
+        getMyTimeline = `SELECT * FROM
+      (
+          SELECT *, ROW_NUMBER() OVER (ORDER BY user_post.id DESC) as row_num
+          FROM 
+          (
+              SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
+              FROM posts 
+              LEFT JOIN users ON posts.posted_by = users.id 
+              INNER JOIN 
+              (
+                  SELECT users.id FROM users 
+                  INNER JOIN friends ON users.id = friends.receiver_id 
+                  WHERE friends.requester_id = ? AND friends.status = ?
+                  UNION
+                  SELECT users.id FROM users 
+                  INNER JOIN friends ON users.id = friends.requester_id 
+                  WHERE friends.receiver_id = ? AND friends.status = ?
+                  UNION
+                  SELECT users.id FROM users
+                  WHERE users.id = ?
+              ) AS my_friend_and_I
+              ON my_friend_and_I.id = users.id
+              LEFT JOIN comments ON posts.id = comments.post
+              LEFT JOIN likes ON posts.id = likes.post
+          ) AS user_post
+      ) AS numbered_my_timeline
+      WHERE row_num > ?
+      LIMIT ?;`;
+      }
+      const myTimeline = await conn.query(getMyTimeline, [
+        id,
+        friendStatus,
+        id,
+        friendStatus,
+        id,
+        cursor,
+        itemsPerPage,
+      ]);
+      return myTimeline[0];
+    } catch (err) {
+      if (err === errMes.clientError) {
+        throw errMes.clientError;
+      } else {
+        console.log(err);
+        throw errMes.serverError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
+  getTimelineByUserId: async (id, cursor, itemsPerPage) => {
+    const conn = await pool.getConnection();
+    try {
+      const checkUserExistence = "SELECT id FROM users WHERE id = ?";
+      const userExistence = await conn.query(checkUserExistence, [id]);
+      if (userExistence[0].length === 0) {
+        throw errMes.clientError;
+      }
+      let getTimelineByUserId;
+      if (!cursor) {
+        getTimelineByUserId = `SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
+          FROM posts 
+          INNER JOIN users ON posts.posted_by = users.id 
+          LEFT JOIN comments ON posts.id = comments.post
+          LEFT JOIN likes ON posts.id = likes.post
+          WHERE users.id = ?
+      ;`;
+      } else {
+        getTimelineByUserId = `SELECT * FROM
+      (SELECT *, ROW_NUMBER() OVER (ORDER BY user_post.id DESC) as row_num
+        FROM 
+        (SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
+          FROM posts 
+          INNER JOIN users ON posts.posted_by = users.id 
+          LEFT JOIN comments ON posts.id = comments.post
+          LEFT JOIN likes ON posts.id = likes.post
+          WHERE users.id = ?
+          ) AS user_post
+        )AS numbered_public_timeline
+      WHERE row_num > ?
+      LIMIT ?;`;
+      }
+      const publicUserTimeline = await conn.query(getTimelineByUserId, [
+        id,
+        cursor,
+        itemsPerPage,
+      ]);
+      return publicUserTimeline[0];
+    } catch (err) {
+      if (err === errMes.clientError) {
+        throw errMes.clientError;
+      } else {
+        console.log(err);
+        throw errMes.serverError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
 };
