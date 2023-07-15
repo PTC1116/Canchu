@@ -1,5 +1,6 @@
 const model = require("../models/postModel");
 const errMes = require("../../util/errorMessage");
+const util = require("../../util/postUtil");
 
 module.exports = {
   post: async (req, res) => {
@@ -92,6 +93,57 @@ module.exports = {
       const postId = req.params.id * 1;
       const result = await model.getPostDetail(postId);
       const successObj = { data: result };
+      res.status(200).send(successObj);
+    } catch (err) {
+      if (err.status) {
+        return res.status(err.status).send({ error: err.error });
+      } else {
+        console.log(err);
+      }
+    }
+  },
+  search: async (req, res) => {
+    try {
+      const targetId = req.query.user_id;
+      const cursorStr = req.query.cursor;
+      const myId = req.userData.id;
+      const itemsPerPage = 10;
+      let nextCursor;
+      let result;
+      if (cursorStr && targetId) {
+        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
+          "utf-8"
+        );
+        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getTimelineByUserId(
+          targetId,
+          itemsPerPage,
+          decodedCursor
+        );
+      } else if (cursorStr && !targetId) {
+        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
+          "utf-8"
+        );
+        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getMyTimeline(myId, itemsPerPage, decodedCursor);
+      } else if (!cursorStr && targetId) {
+        const nextPageIndex = itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getTimelineByUserId(targetId, itemsPerPage);
+      } else if (!cursorStr && !targetId) {
+        const nextPageIndex = itemsPerPage;
+        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+        result = await model.getMyTimeline(myId, itemsPerPage);
+      }
+      const posts = util.generatePostSearchObj(result);
+      let successObj;
+      if (posts.length < itemsPerPage) {
+        successObj = { data: { posts, next_cursor: null } };
+      } else {
+        successObj = { data: { posts, next_cursor: nextCursor } };
+      }
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {
