@@ -20,7 +20,7 @@ module.exports = {
   post: async (id, context) => {
     const conn = await pool.getConnection();
     try {
-      const insertData = `INSERT INTO posts (posted_by, context, DATE_FORMAT(created_at,"%Y-%m-%d %H:%i:%s") AS created_at VALUES (?,?, now())`;
+      const insertData = `INSERT INTO posts (posted_by, context, DATE_FORMAT(created_at,"%Y-%m-%d %H:%i:%s") AS created_at) VALUES (?,?, now())`;
       const result = await conn.query(insertData, [id, context]);
       return result[0].insertId;
     } catch (err) {
@@ -64,33 +64,28 @@ module.exports = {
   createLike: async (userId, postId) => {
     const conn = await pool.getConnection();
     try {
-      // 確認該貼文是否存在
       const postExistence = await module.exports.checkPostExistenceById(
         conn,
         postId
       );
       if (!postExistence) {
-        throw { error: "Post Not Found", status: 400 };
+        throw errMsg.generateMsg(403, "Post Not Found");
       }
-      // 查看該貼文是否已被該用戶按讚過
-      const checkPostStatus =
+      const isPostAlreadyLiked =
         "SELECT * FROM likes WHERE like_user = ? AND post = ?";
-      const checkResult = await conn.query(checkPostStatus, [userId, postId]);
-      if (checkResult[0].length > 0) {
-        throw { error: "Post has already been liked" };
+      const result = await conn.query(isPostAlreadyLiked, [userId, postId]);
+      if (result[0].length > 0) {
+        throw errMsg.generateMsg(403, "Post has already been liked");
       }
-      const insertData = `INSERT INTO likes(like_user, post)
-        SELECT ?, ?
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM likes
-            WHERE like_user = ? AND post = ?
-        );`;
+      const insertData = `INSERT INTO likes(like_user, post) WHERE like_user = ? AND post = ?;`;
       await conn.query(insertData, [userId, postId, userId, postId]);
       return postId;
     } catch (err) {
-      console.log(err);
-      throw err;
+      if (err.status === 403) {
+        throw err;
+      } else {
+        throw errMsg.dbError;
+      }
     } finally {
       await conn.release();
     }
@@ -102,16 +97,16 @@ module.exports = {
         "SELECT * FROM likes WHERE like_user = ? AND post = ?";
       const result = await conn.query(findTargetPost, [userId, postId]);
       if (result[0].length === 0) {
-        throw errMes.clientError;
+        throw errMsg.generateMsg(403, "Like Not Found");
       }
       const deleteLike = "DELETE FROM likes WHERE like_user = ? AND post = ?";
       await conn.query(deleteLike, [userId, postId]);
       return postId;
     } catch (err) {
-      if (err === errMes.clientError) {
-        throw errMes.clientError;
+      if (err.status === 403) {
+        throw err;
       } else {
-        throw errMes.serverError;
+        throw errMsg.dbError;
       }
     } finally {
       await conn.release();
@@ -120,22 +115,21 @@ module.exports = {
   createComment: async (userId, postId, content) => {
     const conn = await pool.getConnection();
     try {
-      // 確認該貼文是否存在
-      const findTargetPost = "SELECT * FROM posts WHERE id = ?";
-      const findResult = await conn.query(findTargetPost, [postId]);
-      if (findResult[0].length === 0) {
-        throw errMes.clientError;
+      const postExistence = await module.exports.checkPostExistenceById(
+        conn,
+        postId
+      );
+      if (!postExistence) {
+        throw errMsg.generateMsg(403, "Post Not Found");
       }
-      const insertData =
-        "INSERT INTO comments (author,post,content,created_at) VALUES (?,?,?,now())";
+      const insertData = `INSERT INTO comments (author,post,content,DATE_FORMAT(created_at,"%Y-%m-%d %H:%i:%s") AS created_at) VALUES (?,?,?,now())`;
       const result = await conn.query(insertData, [userId, postId, content]);
       return result[0].insertId;
     } catch (err) {
-      if (err === errMes.clientError) {
-        throw errMes.clientError;
+      if (err.status === 403) {
+        throw err;
       } else {
-        console.log(err);
-        throw errMes.serverError;
+        throw errMsg.dbError;
       }
     } finally {
       await conn.release();
