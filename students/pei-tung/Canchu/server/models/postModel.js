@@ -20,8 +20,7 @@ module.exports = {
   post: async (id, context) => {
     const conn = await pool.getConnection();
     try {
-      const insertData =
-        "INSERT INTO posts (posted_by, context, created_at) VALUES (?,?, now())";
+      const insertData = `INSERT INTO posts (posted_by, context, DATE_FORMAT(created_at,"%Y-%m-%d %H:%i:%s") AS created_at VALUES (?,?, now())`;
       const result = await conn.query(insertData, [id, context]);
       return result[0].insertId;
     } catch (err) {
