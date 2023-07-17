@@ -92,13 +92,11 @@ module.exports = {
       const targetId = req.query.user_id;
       const myId = req.userData.id;
       const itemsPerPage = 10;
-      let cursor = 0;
+      let cursor = (await model.countTotalPost()) + 1;
       const cursorStr = req.query.cursor;
       if (cursorStr) {
         cursor = Buffer.from(cursorStr, "base64").toString("utf-8");
       }
-      let nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-
       let result;
       if (targetId) {
         result = await model.getTimelineByUserId(
@@ -109,50 +107,20 @@ module.exports = {
       } else {
         result = await model.getMyTimeline(myId, itemsPerPage, cursor);
       }
-
-      // let nextCursor;
-      /*
-      if (cursorStr && targetId) {
-        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
-          "utf-8"
-        );
-        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getTimelineByUserId(
-          targetId,
-          itemsPerPage,
-          decodedCursor
-        );
-      } else if (cursorStr && !targetId) {
-        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
-          "utf-8"
-        );
-        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId, itemsPerPage, decodedCursor);
-      } else if (!cursorStr && targetId) {
-        const nextPageIndex = itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getTimelineByUserId(targetId, itemsPerPage);
-      } else if (!cursorStr && !targetId) {
-        const nextPageIndex = itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId, itemsPerPage);
-      }*/
       const posts = util.generatePostSearchObj(result);
       let successObj;
       if (posts.length < itemsPerPage) {
         successObj = { data: { posts, next_cursor: null } };
       } else {
+        const nextPageIndex = posts[posts.length - 1].id;
+        let nextCursor = Buffer.from(nextPageIndex.toString()).toString(
+          "base64"
+        );
         successObj = { data: { posts, next_cursor: nextCursor } };
       }
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      res.status(err.status).send({ error: err.error });
     }
   },
 };
