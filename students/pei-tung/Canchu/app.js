@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
 
@@ -11,6 +12,7 @@ const friendRoutes = require("./server/routes/friendRoute");
 const eventRoutes = require("./server/routes/eventRoutes");
 const postRoutes = require("./server/routes/postRoutes");
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
