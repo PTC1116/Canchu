@@ -1,5 +1,5 @@
 const model = require("../models/postModel");
-const errMes = require("../../util/errorMessage");
+const errMsg = require("../../util/errorMessage");
 const util = require("../../util/postUtil");
 
 module.exports = {
@@ -7,18 +7,15 @@ module.exports = {
     try {
       const authorId = req.userData.id;
       const context = req.body.context;
-      if (!context.trim()) {
-        throw errMes.clientError;
+      if (!context || !context.trim()) {
+        throw errMsg.generateMsg(403, "Post Context Cannot Be Blank");
       }
       const postId = await model.post(authorId, context);
       const successObj = { data: { post: { id: postId } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   postUpdated: async (req, res) => {
@@ -26,18 +23,15 @@ module.exports = {
       const userId = req.userData.id;
       const postId = req.params.id * 1;
       const newContext = req.body.context;
-      if (!newContext.trim()) {
-        throw errMes.clientError;
+      if (!newContext || !newContext.trim()) {
+        throw errMsg.generateMsg(403, "Update Context Cannot Be Blank");
       }
       const result = await model.postUpdated(userId, postId, newContext);
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   createLike: async (req, res) => {
@@ -48,11 +42,8 @@ module.exports = {
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   deleteLike: async (req, res) => {
@@ -63,11 +54,8 @@ module.exports = {
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
   createComment: async (req, res) => {
@@ -75,17 +63,17 @@ module.exports = {
       const userId = req.userData.id;
       const postId = req.params.id * 1;
       const content = req.body.content;
+      if (!content || !content.trim()) {
+        throw errMsg.generateMsg(403, "Comment Content Cannot Be Blank");
+      }
       const result = await model.createComment(userId, postId, content);
       const successObj = {
         data: { post: { id: postId }, comment: { id: result } },
       };
-      res.status(200).send(successObj);
+      res.status(200).json(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   getPostDetail: async (req, res) => {
@@ -95,62 +83,44 @@ module.exports = {
       const successObj = { data: result };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).json({ error: err.error });
     }
   },
   search: async (req, res) => {
     try {
       const targetId = req.query.user_id;
-      const cursorStr = req.query.cursor;
       const myId = req.userData.id;
       const itemsPerPage = 10;
-      let nextCursor;
+      let cursor = (await model.countTotalPost()) + 1;
+      const cursorStr = req.query.cursor;
+      if (cursorStr) {
+        cursor = Buffer.from(cursorStr, "base64").toString("utf-8");
+      }
       let result;
-      if (cursorStr && targetId) {
-        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
-          "utf-8"
-        );
-        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+      if (targetId) {
         result = await model.getTimelineByUserId(
           targetId,
           itemsPerPage,
-          decodedCursor
+          cursor
         );
-      } else if (cursorStr && !targetId) {
-        const decodedCursor = Buffer.from(cursorStr, "base64").toString(
-          "utf-8"
-        );
-        const nextPageIndex = decodedCursor * 1 + itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId, itemsPerPage, decodedCursor);
-      } else if (!cursorStr && targetId) {
-        const nextPageIndex = itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getTimelineByUserId(targetId, itemsPerPage);
-      } else if (!cursorStr && !targetId) {
-        const nextPageIndex = itemsPerPage;
-        nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
-        result = await model.getMyTimeline(myId, itemsPerPage);
+      } else {
+        result = await model.getMyTimeline(myId, itemsPerPage, cursor);
       }
       const posts = util.generatePostSearchObj(result);
       let successObj;
       if (posts.length < itemsPerPage) {
         successObj = { data: { posts, next_cursor: null } };
       } else {
+        const nextPageIndex = posts[posts.length - 1].id;
+        let nextCursor = Buffer.from(nextPageIndex.toString()).toString(
+          "base64"
+        );
         successObj = { data: { posts, next_cursor: nextCursor } };
       }
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      res.status(err.status).send({ error: err.error });
     }
   },
 };
