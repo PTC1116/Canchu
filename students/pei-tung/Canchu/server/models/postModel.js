@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-const errMes = require("../../util/errorMessage");
+const errMsg = require("../../util/errorMessage");
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -24,20 +24,39 @@ module.exports = {
       const result = await conn.query(insertData, [id, context]);
       return result[0].insertId;
     } catch (err) {
-      throw errMes.serverError;
+      throw errMsg.dbError;
     } finally {
       await conn.release();
     }
   },
+  checkPostExistenceById: async (conn, id) => {
+    const findTargetPost = "SELECT * FROM posts WHERE id = ?";
+    const findResult = await conn.query(findTargetPost, [id]);
+    if (findResult[0].length === 0) {
+      return false;
+    }
+    return true;
+  },
   postUpdated: async (userId, postId, context) => {
     const conn = await pool.getConnection();
     try {
+      const postExistence = await module.exports.checkPostExistenceById(
+        conn,
+        postId
+      );
+      if (!postExistence) {
+        throw errMsg.generateMsg(403, "Post Not Found");
+      }
       const updateData =
         "UPDATE posts SET context = ? WHERE id = ? AND posted_by = ?";
-      const result = await conn.query(updateData, [context, postId, userId]);
+      await conn.query(updateData, [context, postId, userId]);
       return postId;
     } catch (err) {
-      throw errMes.serverError;
+      if (err.status === 403) {
+        throw err;
+      } else {
+        throw errMsg.dbError;
+      }
     } finally {
       await conn.release();
     }
@@ -46,17 +65,19 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       // 確認該貼文是否存在
-      const findTargetPost = "SELECT * FROM posts WHERE id = ?";
-      const findResult = await conn.query(findTargetPost, [postId]);
-      if (findResult[0].length === 0) {
-        throw errMes.clientError;
+      const postExistence = await module.exports.checkPostExistenceById(
+        conn,
+        postId
+      );
+      if (!postExistence) {
+        throw { error: "Post Not Found", status: 400 };
       }
       // 查看該貼文是否已被該用戶按讚過
       const checkPostStatus =
         "SELECT * FROM likes WHERE like_user = ? AND post = ?";
       const checkResult = await conn.query(checkPostStatus, [userId, postId]);
       if (checkResult[0].length > 0) {
-        throw errMes.clientError;
+        throw { error: "Post has already been liked" };
       }
       const insertData = `INSERT INTO likes(like_user, post)
         SELECT ?, ?
@@ -68,12 +89,8 @@ module.exports = {
       await conn.query(insertData, [userId, postId, userId, postId]);
       return postId;
     } catch (err) {
-      if (err === errMes.clientError) {
-        throw errMes.clientError;
-      } else {
-        console.log(err);
-        throw errMes.serverError;
-      }
+      console.log(err);
+      throw err;
     } finally {
       await conn.release();
     }

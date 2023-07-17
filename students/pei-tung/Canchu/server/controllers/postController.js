@@ -1,5 +1,5 @@
 const model = require("../models/postModel");
-const errMes = require("../../util/errorMessage");
+const errMsg = require("../../util/errorMessage");
 const util = require("../../util/postUtil");
 
 module.exports = {
@@ -7,18 +7,15 @@ module.exports = {
     try {
       const authorId = req.userData.id;
       const context = req.body.context;
-      if (!context.trim()) {
-        throw errMes.clientError;
+      if (!context || !context.trim()) {
+        throw errMsg.generateMsg(403, "Post Context Cannot Be Balnk");
       }
       const postId = await model.post(authorId, context);
       const successObj = { data: { post: { id: postId } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).json({ error: err.error });
     }
   },
   postUpdated: async (req, res) => {
@@ -26,18 +23,15 @@ module.exports = {
       const userId = req.userData.id;
       const postId = req.params.id * 1;
       const newContext = req.body.context;
-      if (!newContext.trim()) {
-        throw errMes.clientError;
+      if (!newContext || !newContext.trim()) {
+        throw errMsg.generateMsg(403, "Update Content Cannot Be Blank");
       }
       const result = await model.postUpdated(userId, postId, newContext);
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).json({ error: err.error });
     }
   },
   createLike: async (req, res) => {
@@ -49,7 +43,7 @@ module.exports = {
       res.status(200).send(successObj);
     } catch (err) {
       if (err.status) {
-        return res.status(err.status).send({ error: err.error });
+        res.status(err.status).send({ error: err.error });
       } else {
         console.log(err);
       }
