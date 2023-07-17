@@ -24,7 +24,7 @@ module.exports = {
       const postId = req.params.id * 1;
       const newContext = req.body.context;
       if (!newContext || !newContext.trim()) {
-        throw errMsg.generateMsg(403, "Update Content Cannot Be Blank");
+        throw errMsg.generateMsg(403, "Update Context Cannot Be Blank");
       }
       const result = await model.postUpdated(userId, postId, newContext);
       const successObj = { data: { post: { id: result } } };
@@ -69,6 +69,9 @@ module.exports = {
       const userId = req.userData.id;
       const postId = req.params.id * 1;
       const content = req.body.content;
+      if (!content || !content.trim()) {
+        throw errMsg.generateMsg(403, "Comment Content Cannot Be Balnk");
+      }
       const result = await model.createComment(userId, postId, content);
       const successObj = {
         data: { post: { id: postId }, comment: { id: result } },
