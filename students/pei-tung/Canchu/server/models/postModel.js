@@ -148,9 +148,9 @@ module.exports = {
       }
       const findPostOwner = `
       SELECT p.id AS postId, DATE_FORMAT(p.created_at,"%Y-%m-%d %H:%i:%s") AS created_at, p.context, 
-      IF ((SELECT COUNT(*) FROM likes WHERE l.post = p.id) > 0, true, false) AS is_liked, 
-      (SELECT COUNT(*) FROM likes WHERE l.post = p.id) AS like_count,  
-      (SELECT COUNT(*) FROM comments WHERE c.post = p.id) AS comment_count, 
+      COUNT(l.id) > 0 AS is_liked, 
+      COUNT(l.id) AS like_count,  
+      COUNT(c.id) AS comment_count, 
       u.picture, u.name 
       FROM users AS u
       INNER JOIN posts AS p ON u.id = p.posted_by
@@ -210,45 +210,17 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = "friend";
-      let getMyTimeline;
-      if (!cursor) {
-        console.log("nocursor");
-        getMyTimeline = `SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
-        FROM posts 
-        LEFT JOIN users ON posts.posted_by = users.id 
-        INNER JOIN 
-        (
-            SELECT users.id FROM users 
-            INNER JOIN friends ON users.id = friends.receiver_id 
-            WHERE friends.requester_id = ? AND friends.status = ?
-            UNION
-            SELECT users.id FROM users 
-            INNER JOIN friends ON users.id = friends.requester_id 
-            WHERE friends.receiver_id = ? AND friends.status = ?
-            UNION
-            SELECT users.id FROM users
-            WHERE users.id = ?
-        ) AS my_friend_and_I
-        ON my_friend_and_I.id = users.id
-        LEFT JOIN comments ON posts.id = comments.post
-        LEFT JOIN likes ON posts.id = likes.post
-        LIMIT ?;`;
-        const myTimeline = await conn.query(getMyTimeline, [
-          id,
-          friendStatus,
-          id,
-          friendStatus,
-          id,
-          itemsPerPage,
-        ]);
-        return myTimeline[0];
-      } else {
-        getMyTimeline = `SELECT * FROM
+      const getMyTimeline = `
+      SELECT * FROM
       (
           SELECT *, ROW_NUMBER() OVER (ORDER BY user_post.id DESC) as row_num
           FROM 
           (
-              SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, users.picture, users.name
+              SELECT DISTINCT posts.id, users.id AS user_id, posts.created_at, posts.context, 
+              IF ((SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) > 0, true, false) AS is_liked, 
+              (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) as like_count,  
+              (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS comment_count, 
+              users.picture, users.name
               FROM posts 
               LEFT JOIN users ON posts.posted_by = users.id 
               INNER JOIN 
@@ -271,7 +243,6 @@ module.exports = {
       ) AS numbered_my_timeline
       WHERE row_num > ?
       LIMIT ?;`;
-      }
       const myTimeline = await conn.query(getMyTimeline, [
         id,
         friendStatus,

@@ -8,14 +8,14 @@ module.exports = {
       const authorId = req.userData.id;
       const context = req.body.context;
       if (!context || !context.trim()) {
-        throw errMsg.generateMsg(403, "Post Context Cannot Be Balnk");
+        throw errMsg.generateMsg(403, "Post Context Cannot Be Blank");
       }
       const postId = await model.post(authorId, context);
       const successObj = { data: { post: { id: postId } } };
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
-      res.status(err.status).json({ error: err.error });
+      res.status(err.status).send({ error: err.error });
     }
   },
   postUpdated: async (req, res) => {
@@ -31,7 +31,7 @@ module.exports = {
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
-      res.status(err.status).json({ error: err.error });
+      res.status(err.status).send({ error: err.error });
     }
   },
   createLike: async (req, res) => {
@@ -42,11 +42,8 @@ module.exports = {
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   deleteLike: async (req, res) => {
@@ -57,11 +54,8 @@ module.exports = {
       const successObj = { data: { post: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
   createComment: async (req, res) => {
@@ -70,19 +64,16 @@ module.exports = {
       const postId = req.params.id * 1;
       const content = req.body.content;
       if (!content || !content.trim()) {
-        throw errMsg.generateMsg(403, "Comment Content Cannot Be Balnk");
+        throw errMsg.generateMsg(403, "Comment Content Cannot Be Blank");
       }
       const result = await model.createComment(userId, postId, content);
       const successObj = {
         data: { post: { id: postId }, comment: { id: result } },
       };
-      res.status(200).send(successObj);
+      res.status(200).json(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).send({ error: err.error });
     }
   },
   getPostDetail: async (req, res) => {
@@ -92,21 +83,35 @@ module.exports = {
       const successObj = { data: result };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      res.status(err.status).json({ error: err.error });
     }
   },
   search: async (req, res) => {
     try {
       const targetId = req.query.user_id;
-      const cursorStr = req.query.cursor;
       const myId = req.userData.id;
       const itemsPerPage = 10;
-      let nextCursor;
+      let cursor = 0;
+      const cursorStr = req.query.cursor;
+      if (cursorStr) {
+        cursor = Buffer.from(cursorStr, "base64").toString("utf-8");
+      }
+      let nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
+
       let result;
+      if (targetId) {
+        result = await model.getTimelineByUserId(
+          targetId,
+          itemsPerPage,
+          cursor
+        );
+      } else {
+        result = await model.getMyTimeline(myId, itemsPerPage, cursor);
+      }
+
+      // let nextCursor;
+      /*
       if (cursorStr && targetId) {
         const decodedCursor = Buffer.from(cursorStr, "base64").toString(
           "utf-8"
@@ -133,7 +138,7 @@ module.exports = {
         const nextPageIndex = itemsPerPage;
         nextCursor = Buffer.from(nextPageIndex.toString()).toString("base64");
         result = await model.getMyTimeline(myId, itemsPerPage);
-      }
+      }*/
       const posts = util.generatePostSearchObj(result);
       let successObj;
       if (posts.length < itemsPerPage) {
