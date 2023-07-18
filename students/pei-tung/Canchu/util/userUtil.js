@@ -1,4 +1,4 @@
-const multer = require("multer");
+const multer = require('multer');
 
 module.exports = {
   generateUserObj: (obj) => {
@@ -13,11 +13,10 @@ module.exports = {
   pictureUploadSetting: () => {
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
-        // 本來想寫路徑但好像應該要寫資料夾名稱？
-        cb(null, "public");
+        cb(null, 'public');
       },
       filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, uniqueSuffix);
       },
     });
@@ -25,9 +24,6 @@ module.exports = {
     return upload;
   },
   generateUserSearchObj: (arr) => {
-    if (arr.length === 0) {
-      return;
-    }
     const users = [];
     arr.forEach((el) => {
       const { userId, name, picture, id, status } = el;
