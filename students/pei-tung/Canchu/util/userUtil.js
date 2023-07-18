@@ -1,4 +1,5 @@
 const multer = require('multer');
+const path = require('path');
 
 module.exports = {
   generateUserObj: (obj) => {
@@ -16,8 +17,10 @@ module.exports = {
         cb(null, 'public/pictures');
       },
       filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix);
+        const ext = path.extname(file.originalname);
+        const filename =
+          Date.now() + '-' + Math.floor(Math.random() * 100000) + ext;
+        cb(null, filename);
       },
     });
     const upload = multer({ storage });
