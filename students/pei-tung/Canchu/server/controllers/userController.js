@@ -114,13 +114,12 @@ module.exports = {
   },
   userPictureUpdate: async (req, res) => {
     try {
-      const picPath = req.file.path;
+      const picName = req.file.filename;
       const id = req.userData.id;
-      const updatedPic = await userModel.userPictureUpdate(id, picPath);
-      const picUrl = `https://13.211.10.154/${updatedPic}`;
+      const updatedPicUrl = await userModel.userPictureUpdate(id, picName);
       const successRes = {
         data: {
-          picture: picUrl,
+          picture: updatedPicUrl,
         },
       };
       return res.status(200).send(successRes);

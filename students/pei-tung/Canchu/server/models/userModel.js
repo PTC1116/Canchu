@@ -164,7 +164,7 @@ module.exports = {
       await conn.release();
     }
   },
-  userPictureUpdate: async (id, path) => {
+  userPictureUpdate: async (id, picName) => {
     const conn = await pool.getConnection();
     try {
       const userExistence = await module.exports.checkUserExistenceById(
@@ -174,9 +174,11 @@ module.exports = {
       if (!userExistence) {
         throw errMsg.generateMsg(403, 'User Not Found');
       }
+      const myIp = '13.211.10.154';
+      const picUrl = `https://${myIp}/pictures${picName}`;
       const updatedPicById = 'UPDATE users SET picture = ? WHERE id = ?';
-      await conn.query(updatedPicById, [path, id]);
-      return path;
+      await conn.query(updatedPicById, [picUrl, id]);
+      return picUrl;
     } catch (err) {
       if (err.status === 403) {
         throw err;
