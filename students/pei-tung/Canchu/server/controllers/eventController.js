@@ -1,5 +1,5 @@
-const eventModel = require("../models/eventModel");
-const eventUtil = require("../../util/eventUtil");
+const eventModel = require('../models/eventModel');
+const eventUtil = require('../../util/eventUtil');
 
 module.exports = {
   getEvent: async (req, res) => {
@@ -10,11 +10,8 @@ module.exports = {
       const successObj = { data: { events: events } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
   readEvent: async (req, res) => {
@@ -25,11 +22,8 @@ module.exports = {
       const successObj = { data: { event: { id: result } } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
 };

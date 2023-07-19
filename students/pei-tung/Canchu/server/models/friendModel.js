@@ -38,6 +38,7 @@ module.exports = {
       ]);
       return result;
     } catch (err) {
+      console.log(err);
       throw errMsg.dbError;
     } finally {
       await conn.release;
@@ -55,6 +56,7 @@ module.exports = {
       const [pendingList] = await conn.query(findPendingList, [id, status]);
       return pendingList;
     } catch (err) {
+      console.log(err);
       throw errMsg.dbError;
     } finally {
       await conn.release();

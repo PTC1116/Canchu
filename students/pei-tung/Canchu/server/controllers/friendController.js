@@ -24,7 +24,7 @@ module.exports = {
         'pending',
       );
       const successObj = { data: { users } };
-      return res.status(200).send(successObj);
+      res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
       return res.status(err.status).send({ error: err.error });
@@ -76,7 +76,7 @@ module.exports = {
           },
         },
       };
-      return res.status(200).send(successObj);
+      res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
       return res.status(err.status).send({ error: err.error });
