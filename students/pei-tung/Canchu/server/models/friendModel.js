@@ -144,7 +144,7 @@ module.exports = {
       await conn.release();
     }
   },
-  delete: async (uId, fid) => {
+  delete: async (uId, fId) => {
     const conn = await pool.getConnection();
     try {
       const checkFriendshipExistenceById = `
@@ -153,7 +153,7 @@ module.exports = {
       OR (id = ? AND receiver_id = ?)`;
       const [friendshipExistence] = await conn.query(
         checkFriendshipExistenceById,
-        [fid, uId, fid, uId],
+        [fId, uId, fId, uId],
       );
       if (friendshipExistence.length === 0) {
         throw errMsg.generateMsg(403, 'Friendship Not Found');
@@ -162,7 +162,7 @@ module.exports = {
       DELETE from friends
       WHERE (id = ? AND requester_id = ?) 
       OR (id = ? AND receiver_id = ?)`;
-      await conn.query(deleteFriendshipById, [fid, uId, fId, uId]);
+      await conn.query(deleteFriendshipById, [fId, uId, fId, uId]);
       return fId;
       /*
       const invitationStatus = 'requested';
@@ -204,6 +204,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
