@@ -37,15 +37,16 @@ module.exports = {
   getEvent: async (id) => {
     const conn = await pool.getConnection();
     try {
-      const findNotif =
-        'SELECT events.id, type, is_read, picture, created_at, summary FROM users INNER JOIN events ON users.id = events.performer_id WHERE recipient_id = ?';
+      const findNotif = `SELECT events.id, type, is_read, picture, created_at, summary 
+        FROM users INNER JOIN events ON users.id = events.performer_id 
+        WHERE recipient_id = ?`;
       const allNotif = await conn.query(findNotif, [id]);
       return allNotif[0];
     } catch (err) {
       console.log(err);
       throw errMes.serverError;
     } finally {
-      await conn.release;
+      await conn.release();
     }
   },
   readEvent: async (eventId, userId) => {

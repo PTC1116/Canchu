@@ -7,7 +7,8 @@ module.exports = {
       const recipientId = req.userData.id;
       const allNotif = await eventModel.getEvent(recipientId);
       const events = eventUtil.generateEventObj(allNotif);
-      const successObj = { data: { events: events } };
+      const successObj = { data: { events } };
+      console.log(successObj);
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
@@ -18,8 +19,8 @@ module.exports = {
     try {
       const eventId = req.params.event_id * 1;
       const recipientId = req.userData.id;
-      const result = await eventModel.readEvent(eventId, recipientId);
-      const successObj = { data: { event: { id: result } } };
+      const id = await eventModel.readEvent(eventId, recipientId);
+      const successObj = { data: { event: { id } } };
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);

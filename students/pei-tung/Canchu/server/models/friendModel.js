@@ -51,7 +51,7 @@ module.exports = {
       console.log(err);
       throw errMsg.dbError;
     } finally {
-      await conn.release;
+      await conn.release();
     }
   },
   pending: async (id) => {
