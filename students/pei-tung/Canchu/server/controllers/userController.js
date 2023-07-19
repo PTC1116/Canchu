@@ -123,7 +123,7 @@ module.exports = {
   userPictureUpdate: async (req, res) => {
     try {
       const header = req.get('Content-Type');
-      if (header !== 'multipart/form-data') {
+      if (!header.includes('multipart/form-data')) {
         throw errMsg.invaildHeader;
       }
       const picName = req.file.filename;
