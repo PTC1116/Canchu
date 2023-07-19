@@ -122,6 +122,10 @@ module.exports = {
   },
   userPictureUpdate: async (req, res) => {
     try {
+      const header = req.get('Content-Type');
+      if (header !== 'multipart/form-data') {
+        throw errMsg.invaildHeader;
+      }
       const picName = req.file.filename;
       const id = req.userData.id;
       const updatedPicUrl = await userModel.userPictureUpdate(id, picName);
@@ -139,7 +143,7 @@ module.exports = {
   userProfileUpdate: async (req, res) => {
     try {
       const header = req.get('Content-Type');
-      if (header !== 'multipart/form-data') {
+      if (header !== 'application/json') {
         throw errMsg.invaildHeader;
       }
       const id = req.userData.id;
