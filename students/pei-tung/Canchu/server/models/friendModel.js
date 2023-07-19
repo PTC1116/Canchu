@@ -33,12 +33,13 @@ module.exports = {
       const findFriends = `
       SELECT users.id AS userId, name, picture, friends.id AS friendId 
       FROM users 
-      INNER JOIN friends ON (users.id = friends.receiver_id)
-      WHERE requester_id = ? AND status = ?)
+      INNER JOIN friends ON users.id = friends.receiver_id
+      WHERE requester_id = ? AND status = ?
       UNION
-      SELECT users.id AS userId, name, picture, friends.id AS friendId FROM users 
-      INNER JOIN friends ON (users.id = friends.requester_id)
-      WHERE receiver_id = ? AND status = ?)`;
+      SELECT users.id AS userId, name, picture, friends.id AS friendId 
+      FROM users 
+      INNER JOIN friends ON users.id = friends.requester_id
+      WHERE receiver_id = ? AND status = ?`;
       const [result] = await conn.query(findFriends, [
         id,
         friendStatus,
