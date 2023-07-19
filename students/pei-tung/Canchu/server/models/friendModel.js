@@ -46,7 +46,6 @@ module.exports = {
         id,
         friendStatus,
       ]);
-      console.log('result:', result);
       return result;
     } catch (err) {
       console.log(err);

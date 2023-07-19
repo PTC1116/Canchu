@@ -36,7 +36,10 @@ module.exports = {
       const requesterId = req.userData.id;
       // prevent users from sending friend request to themselves
       if (receiverId === requesterId) {
-        throw errorMes.clientError;
+        throw errorMsg.generateUserSearchObj(
+          403,
+          'You Cannot Not Send A Requset To Yourself',
+        );
       }
       const id = await friendModel.request(requesterId, receiverId);
       // send notification
