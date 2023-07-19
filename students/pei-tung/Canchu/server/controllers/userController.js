@@ -144,14 +144,7 @@ module.exports = {
       }
       const id = req.userData.id;
       const { name, introduction: intro, tags } = req.body;
-      if (
-        !name ||
-        !name.trim().length ||
-        !intro ||
-        !intro.trim().length ||
-        !tags ||
-        !tags.trim().length
-      ) {
+      if (!name || !name.trim().length) {
         return res.status(400).send('Please fill out all fields');
       }
       const result = await userModel.userProfileUpdate(name, intro, tags, id);
