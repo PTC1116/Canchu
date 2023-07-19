@@ -73,23 +73,24 @@ module.exports = {
         receiverId,
         myId,
       ]);
-      if (friendshipStatus.status === 'friend') {
-        throw errMsg.generateMsg(403, 'You Are Already Friends');
-      } else if (
-        friendshipStatus.status === 'requested' &&
-        friendshipStatus.receiver_id === myId
-      ) {
-        throw errMsg.generateMsg(
-          403,
-          'The User Has Already Sent You A Friend Request',
-        );
-      } else if (
-        friendshipStatus.status === 'requested' &&
-        friendshipStatus.receiver_id === receiverId
-      ) {
-        throw errMsg.generateMsg(403, 'Your Friend Request Is Still Pending');
+      if (friendshipStatus.length > 0) {
+        if (friendshipStatus.status === 'friend') {
+          throw errMsg.generateMsg(403, 'You Are Already Friends');
+        } else if (
+          friendshipStatus.status === 'requested' &&
+          friendshipStatus.receiver_id === myId
+        ) {
+          throw errMsg.generateMsg(
+            403,
+            'The User Has Already Sent You A Friend Request',
+          );
+        } else if (
+          friendshipStatus.status === 'requested' &&
+          friendshipStatus.receiver_id === receiverId
+        ) {
+          throw errMsg.generateMsg(403, 'Your Friend Request Is Still Pending');
+        }
       }
-
       const status = 'requested';
       const insert =
         'INSERT INTO friends (requester_id, receiver_id, status) VALUES(?,?,?)';
