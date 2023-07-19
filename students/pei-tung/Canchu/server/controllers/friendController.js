@@ -46,7 +46,7 @@ module.exports = {
       const successRes = {
         data: {
           friendship: {
-            id: result.ID,
+            id: result,
           },
         },
       };

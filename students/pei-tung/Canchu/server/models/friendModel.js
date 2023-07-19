@@ -73,7 +73,7 @@ module.exports = {
         receiverId,
         myId,
       ]);
-      if (friendshipStatus.length > 0) {
+      if (friendshipStatus) {
         if (friendshipStatus.status === 'friend') {
           throw errMsg.generateMsg(403, 'You Are Already Friends');
         } else if (
@@ -98,7 +98,7 @@ module.exports = {
       const findFriendshipId =
         'SELECT id FROM friends WHERE requester_id = ? AND receiver_id = ?';
       const [[result]] = await conn.query(findFriendshipId, [myId, receiverId]);
-      return result;
+      return result.id;
     } catch (err) {
       if (err.status === 403) {
         throw err;
