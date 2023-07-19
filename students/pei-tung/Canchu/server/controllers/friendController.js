@@ -38,7 +38,7 @@ module.exports = {
       if (receiverId === requesterId) {
         throw errorMes.clientError;
       }
-      const result = await friendModel.request(requesterId, receiverId);
+      const id = await friendModel.request(requesterId, receiverId);
       // send notification
       const eventType = 'friend_request';
       const text = '邀請你成為好友';
@@ -46,7 +46,7 @@ module.exports = {
       const successRes = {
         data: {
           friendship: {
-            id: result,
+            id,
           },
         },
       };
@@ -60,7 +60,7 @@ module.exports = {
     try {
       const userId = req.userData.id;
       const friendshipId = req.params.friendship_id * 1;
-      const result = await friendModel.agree(userId, friendshipId);
+      const id = await friendModel.agree(userId, friendshipId);
       // send notification
       // find notification receiverId with friendshipId (which equal to the requesterId in the friends table)
       const notifReceiverId = await friendModel.findRequesterByFriendshipId(
@@ -72,7 +72,7 @@ module.exports = {
       const successObj = {
         data: {
           friendship: {
-            id: result,
+            id,
           },
         },
       };
@@ -86,8 +86,8 @@ module.exports = {
     try {
       const friendshipId = req.params.friendship_id * 1;
       const userId = req.userData.id;
-      const result = await friendModel.delete(userId, friendshipId);
-      const successObj = { data: { friendship: { id: result } } };
+      const id = await friendModel.delete(userId, friendshipId);
+      const successObj = { data: { friendship: { id } } };
       return res.status(200).send(successObj);
     } catch (err) {
       console.log(err);

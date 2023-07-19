@@ -163,6 +163,7 @@ module.exports = {
       WHERE (id = ? AND requester_id = ?) 
       OR (id = ? AND receiver_id = ?)`;
       await conn.query(deleteFriendshipById, [fid, uId, fId, uId]);
+      return fId;
       /*
       const invitationStatus = 'requested';
       const findInvitation =
