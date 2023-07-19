@@ -10,6 +10,10 @@ const errMsg = require('../../util/errorMessage');
 module.exports = {
   signUp: async (req, res) => {
     try {
+      const header = req.get('Content-Type');
+      if (header !== 'application/json') {
+        throw errMsg.invaildHeader;
+      }
       const { name, email, password } = req.body;
       if (
         !name ||
@@ -49,6 +53,10 @@ module.exports = {
   },
   signIn: async (req, res) => {
     try {
+      const header = req.get('Content-Type');
+      if (header !== 'application/json') {
+        throw errMsg.invaildHeader;
+      }
       const { provider } = req.body;
       if (!provider) {
         throw errMsg.generateMsg(400, 'Sign In Failed: Provider Field Missing');
@@ -124,24 +132,27 @@ module.exports = {
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
   userProfileUpdate: async (req, res) => {
     try {
+      const header = req.get('Content-Type');
+      if (header !== 'multipart/form-data') {
+        throw errMsg.invaildHeader;
+      }
       const id = req.userData.id;
-      console.log(req);
       const { name, introduction: intro, tags } = req.body;
       if (
-        name.trim().length === 0 ||
-        intro.trim().length === 0 ||
-        tags.trim().length === 0
+        !name ||
+        !name.trim().length ||
+        !intro ||
+        !intro.trim().length ||
+        !tags ||
+        !tags.trim().length
       ) {
-        return res.status(400).send('Client Error Response');
+        return res.status(400).send('Please fill out all fields');
       }
       const result = await userModel.userProfileUpdate(name, intro, tags, id);
       const successRes = {
@@ -153,11 +164,8 @@ module.exports = {
       };
       return res.status(200).send(successRes);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
   search: async (req, res) => {
@@ -169,11 +177,8 @@ module.exports = {
       const successObj = { data: { users } };
       res.status(200).send(successObj);
     } catch (err) {
-      if (err.status) {
-        return res.status(err.status).send({ error: err.error });
-      } else {
-        console.log(err);
-      }
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
     }
   },
 };
