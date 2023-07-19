@@ -148,7 +148,7 @@ module.exports = {
           status: 'pending',
         };
       } else {
-        result[0].freindship = {
+        result[0].friendship = {
           id: friendshipStatus[0].id,
           status: friendshipStatus[0].status,
         };

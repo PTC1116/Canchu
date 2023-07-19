@@ -126,7 +126,7 @@ module.exports = {
         throw errMsg.generateMsg(403, 'Friendship Not Found');
       }
       const updateFriendshipById =
-        'UPDATE friends SET status = ? WHERE id = ? AND receiver_id = ? AND status = ?';
+        'UPDATE friends SET status = ? WHERE id = ? AND receiver_id = ?';
       await conn.query(updateFriendshipById, [
         newStatus,
         fId,
