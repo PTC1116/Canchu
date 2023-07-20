@@ -153,7 +153,7 @@ module.exports = {
       IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
-      u.picture, u.name 
+      u.id AS userId, u.picture, u.name 
       FROM users AS u
       INNER JOIN posts AS p ON u.id = p.posted_by
       LEFT JOIN likes AS l ON l.post = p.id
@@ -173,6 +173,7 @@ module.exports = {
           is_liked: postOwnerData.is_liked,
           like_count: postOwnerData.like_count,
           comment_count: postOwnerData.comment_count,
+          user_id: postOwnerData.userId,
           picture: postOwnerData.picture,
           name: postOwnerData.name,
           comments: [],
