@@ -21,13 +21,13 @@ app.use('/api/1.0/posts', postRoutes);
 
 const client = createClient();
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('connect', () => {
+  console.log('Connected to Redis');
+});
 
-await client.connect();
-console.log('connect success');
-await client.set('key', 'value');
-const value = await client.get('key');
-await client.disconnect();
+client.on('error', (err) => {
+  console.error('Redis error:', err);
+});
 
 const port = 3000;
 app.listen(port, () => {
