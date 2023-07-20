@@ -8,7 +8,6 @@ module.exports = {
       const allNotif = await eventModel.getEvent(recipientId);
       const events = eventUtil.generateEventObj(allNotif);
       const successObj = { data: { events } };
-      console.log(successObj);
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);

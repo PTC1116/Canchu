@@ -22,14 +22,6 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = 'friend';
-      /*const findFriends = `
-      SELECT users.id AS userId, name, picture, friends.id AS friendId 
-      FROM users 
-      INNER JOIN friends ON (users.id = friends.receiver_id AND requester_id = ? AND status = ?) 
-      UNION
-      SELECT users.id AS userId, name, picture, friends.id AS friendId FROM users 
-      INNER JOIN friends ON (users.id = friends.requester_id AND receiver_id = ? AND status = ?)
-      ORDER BY userId`;*/
       const findFriends = `
       SELECT users.id AS userId, name, picture, friends.id AS friendId 
       FROM users 
