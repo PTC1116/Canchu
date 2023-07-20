@@ -123,6 +123,7 @@ module.exports = {
       }
       res.status(200).send(successObj);
     } catch (err) {
+      console.log(err);
       res.status(err.status).send({ error: err.error });
     }
   },
