@@ -160,7 +160,7 @@ module.exports = {
       LEFT JOIN comments AS c ON c.post = p.id
       WHERE p.id = ?;`;
       const [[postOwnerData]] = await conn.query(findPostOwner, [
-        userid,
+        userId,
         postId,
         postId,
       ]);
