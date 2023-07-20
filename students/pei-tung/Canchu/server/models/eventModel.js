@@ -37,7 +37,7 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const findNotif = `
-        SELECT events.id, type, is_read, picture, created_at, summary 
+        SELECT events.id, type, is_read, picture, DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at, summary 
         FROM users INNER JOIN events ON users.id = events.performer_id 
         WHERE recipient_id = ?`;
       const [allNotif] = await conn.query(findNotif, [id]);
