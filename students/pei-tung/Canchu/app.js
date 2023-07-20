@@ -7,6 +7,7 @@ const userRoutes = require('./server/routes/userRoute');
 const friendRoutes = require('./server/routes/friendRoute');
 const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
+const redis = require('redis');
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,19 @@ app.use('/api/1.0/users', userRoutes);
 app.use('/api/1.0/friends', friendRoutes);
 app.use('/api/1.0/events', eventRoutes);
 app.use('/api/1.0/posts', postRoutes);
+
+const client = redis.createClient({
+  host: '127.0.0.1',
+  port: 6379,
+});
+
+client.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+client.on('error', (err) => {
+  console.error('Redis error:', err);
+});
 
 const port = 3000;
 app.listen(port, () => {
