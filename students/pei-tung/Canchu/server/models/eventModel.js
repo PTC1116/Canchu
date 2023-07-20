@@ -40,7 +40,8 @@ module.exports = {
       const findNotif = `
         SELECT events.id, type, is_read, picture, DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at, summary 
         FROM users INNER JOIN events ON users.id = events.performer_id 
-        WHERE recipient_id = ?`;
+        WHERE recipient_id = ?
+        ORDER BY events.id DESC`;
       const [allNotif] = await conn.query(findNotif, [id]);
       return allNotif;
     } catch (err) {
