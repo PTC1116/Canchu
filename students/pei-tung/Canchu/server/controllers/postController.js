@@ -79,7 +79,8 @@ module.exports = {
   getPostDetail: async (req, res) => {
     try {
       const postId = req.params.id * 1;
-      const result = await model.getPostDetail(postId);
+      const userId = req.userData.id;
+      const result = await model.getPostDetail(userId, postId);
       const successObj = { data: result };
       res.status(200).send(successObj);
     } catch (err) {

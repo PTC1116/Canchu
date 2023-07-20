@@ -136,7 +136,7 @@ module.exports = {
       await conn.release();
     }
   },
-  getPostDetail: async (postId) => {
+  getPostDetail: async (userId, postId) => {
     const conn = await pool.getConnection();
     try {
       const postExistence = await module.exports.checkPostExistenceById(
@@ -150,7 +150,7 @@ module.exports = {
       SELECT DISTINCT p.id AS postId, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
-      IF((SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked,
+      IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
       u.picture, u.name 
@@ -159,7 +159,11 @@ module.exports = {
       LEFT JOIN likes AS l ON l.post = p.id
       LEFT JOIN comments AS c ON c.post = p.id
       WHERE p.id = ?;`;
-      const [[postOwnerData]] = await conn.query(findPostOwner, [postId]);
+      const [[postOwnerData]] = await conn.query(findPostOwner, [
+        userid,
+        postId,
+        postId,
+      ]);
       let result = {};
       result = {
         post: {
