@@ -24,8 +24,9 @@ module.exports = {
       const findUserName = 'SELECT name FROM users WHERE id = ?';
       const [[performerName]] = await conn.query(findUserName, [performerId]);
       const summary = `${performerName.name}${text}`;
-      const insert = `INSERT INTO events (type,created_at,summary,performer_id,recipient_id) VALUES (?,CONVERT_TZ(NOW(), 'UTC', 'Asia/Taipei')
-        ,?,?,?)`;
+      const insert = `
+      INSERT INTO events (type,created_at,summary,performer_id,recipient_id) 
+      VALUES (?,NOW(),?,?,?)`;
       await conn.query(insert, [type, summary, performerId, recipientId]);
     } catch (err) {
       throw errMsg.dbError;
