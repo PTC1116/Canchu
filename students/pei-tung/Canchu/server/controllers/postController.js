@@ -93,6 +93,7 @@ module.exports = {
       const targetId = req.query.user_id;
       const myId = req.userData.id;
       const itemsPerPage = 10;
+      const itemsPerQuery = itemsPerPage + 1;
       let cursor = (await model.countTotalPost()) + 1;
       const cursorStr = req.query.cursor;
       if (cursorStr) {
@@ -101,16 +102,17 @@ module.exports = {
       let result;
       if (targetId) {
         result = await model.getTimelineByUserId(
+          myId,
           targetId,
-          itemsPerPage,
+          itemsPerQuery,
           cursor,
         );
       } else {
-        result = await model.getMyTimeline(myId, itemsPerPage, cursor);
+        result = await model.getMyTimeline(myId, itemsPerQuery, cursor);
       }
-      const posts = util.generatePostSearchObj(result);
+      const posts = util.generatePostSearchObj(result, itemsPerPage); // 回來要改這個，設定為 10
       let successObj;
-      if (posts.length < itemsPerPage) {
+      if (result.length < itemsPerQuery) {
         successObj = { data: { posts, next_cursor: null } };
       } else {
         const nextPageIndex = posts[posts.length - 1].id;

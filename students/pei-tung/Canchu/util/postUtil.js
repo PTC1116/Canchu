@@ -1,7 +1,7 @@
 module.exports = {
-  generatePostSearchObj: (arr) => {
+  generatePostSearchObj: (arr, itemsPerPage) => {
     let posts = [];
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < itemsPerPage; i++) {
       const {
         id,
         user_id,

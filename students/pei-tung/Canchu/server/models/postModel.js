@@ -205,14 +205,13 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
-        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
       await conn.release();
     }
   },
-  getMyTimeline: async (id, itemsPerPage, cursor) => {
+  getMyTimeline: async (id, itemsPerQuery, cursor) => {
     const conn = await pool.getConnection();
     try {
       const friendStatus = 'friend';
@@ -220,7 +219,7 @@ module.exports = {
       SELECT DISTINCT p.id, u.id AS user_id, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
-      IF((SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked,
+      IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
       u.picture, u.name
@@ -246,12 +245,13 @@ module.exports = {
       LIMIT ?;`;
       const [myTimeline] = await conn.query(getMyTimeline, [
         id,
+        id,
         friendStatus,
         id,
         friendStatus,
         id,
         cursor,
-        itemsPerPage,
+        itemsPerQuery,
       ]);
       return myTimeline;
     } catch (err) {
@@ -260,11 +260,11 @@ module.exports = {
       await conn.release();
     }
   },
-  getTimelineByUserId: async (id, itemsPerPage, cursor) => {
+  getTimelineByUserId: async (myId, targetId, itemsPerQuery, cursor) => {
     const conn = await pool.getConnection();
     try {
       const checkUserExistence = 'SELECT id FROM users WHERE id = ?';
-      const [userExistence] = await conn.query(checkUserExistence, [id]);
+      const [userExistence] = await conn.query(checkUserExistence, [targetId]);
       if (userExistence.length === 0) {
         throw errMsg.generateMsg(403, 'User Not Found');
       }
@@ -272,7 +272,7 @@ module.exports = {
           SELECT DISTINCT p.id, u.id AS user_id, 
           DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
           p.context, 
-          IF ((SELECT COUNT(*) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked, 
+          IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
           (SELECT COUNT(*) FROM likes WHERE likes.post = p.id) as like_count,  
           (SELECT COUNT(*) FROM comments WHERE comments.post = p.id) AS comment_count, 
           u.picture, u.name
@@ -284,17 +284,17 @@ module.exports = {
           ORDER BY p.id DESC
           LIMIT ?;`;
       const publicUserTimeline = await conn.query(getTimelineByUserId, [
-        id,
+        myId,
+        targetId,
         cursor,
-        itemsPerPage,
+        itemsPerQuery,
       ]);
       return publicUserTimeline[0];
     } catch (err) {
-      if (err === errMes.clientError) {
-        throw errMes.clientError;
+      if (err.status === 403) {
+        throw err;
       } else {
-        console.log(err);
-        throw errMes.serverError;
+        throw errMsg.dbError;
       }
     } finally {
       await conn.release();
