@@ -1,6 +1,6 @@
-const model = require("../models/postModel");
-const errMsg = require("../../util/errorMessage");
-const util = require("../../util/postUtil");
+const model = require('../models/postModel');
+const errMsg = require('../../util/errorMessage');
+const util = require('../../util/postUtil');
 
 module.exports = {
   post: async (req, res) => {
@@ -8,7 +8,7 @@ module.exports = {
       const authorId = req.userData.id;
       const context = req.body.context;
       if (!context || !context.trim()) {
-        throw errMsg.generateMsg(403, "Post Context Cannot Be Blank");
+        throw errMsg.generateMsg(403, 'Post Context Cannot Be Blank');
       }
       const postId = await model.post(authorId, context);
       const successObj = { data: { post: { id: postId } } };
@@ -24,7 +24,7 @@ module.exports = {
       const postId = req.params.id * 1;
       const newContext = req.body.context;
       if (!newContext || !newContext.trim()) {
-        throw errMsg.generateMsg(403, "Update Context Cannot Be Blank");
+        throw errMsg.generateMsg(403, 'Update Context Cannot Be Blank');
       }
       const result = await model.postUpdated(userId, postId, newContext);
       const successObj = { data: { post: { id: result } } };
@@ -64,7 +64,7 @@ module.exports = {
       const postId = req.params.id * 1;
       const content = req.body.content;
       if (!content || !content.trim()) {
-        throw errMsg.generateMsg(403, "Comment Content Cannot Be Blank");
+        throw errMsg.generateMsg(403, 'Comment Content Cannot Be Blank');
       }
       const result = await model.createComment(userId, postId, content);
       const successObj = {
@@ -84,7 +84,7 @@ module.exports = {
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
-      res.status(err.status).json({ error: err.error });
+      res.status(err.status).send({ error: err.error });
     }
   },
   search: async (req, res) => {
@@ -95,14 +95,14 @@ module.exports = {
       let cursor = (await model.countTotalPost()) + 1;
       const cursorStr = req.query.cursor;
       if (cursorStr) {
-        cursor = Buffer.from(cursorStr, "base64").toString("utf-8");
+        cursor = Buffer.from(cursorStr, 'base64').toString('utf-8');
       }
       let result;
       if (targetId) {
         result = await model.getTimelineByUserId(
           targetId,
           itemsPerPage,
-          cursor
+          cursor,
         );
       } else {
         result = await model.getMyTimeline(myId, itemsPerPage, cursor);
@@ -114,7 +114,7 @@ module.exports = {
       } else {
         const nextPageIndex = posts[posts.length - 1].id;
         let nextCursor = Buffer.from(nextPageIndex.toString()).toString(
-          "base64"
+          'base64',
         );
         successObj = { data: { posts, next_cursor: nextCursor } };
       }
