@@ -219,7 +219,7 @@ module.exports = {
       SELECT DISTINCT p.id, u.id AS user_id, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
-      IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
+      IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
       u.picture, u.name
@@ -255,6 +255,7 @@ module.exports = {
       ]);
       return myTimeline;
     } catch (err) {
+      console.log(err);
       throw errMsg.dbError;
     } finally {
       await conn.release();
@@ -272,7 +273,7 @@ module.exports = {
           SELECT DISTINCT p.id, u.id AS user_id, 
           DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
           p.context, 
-          IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
+          IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
           (SELECT COUNT(*) FROM likes WHERE likes.post = p.id) as like_count,  
           (SELECT COUNT(*) FROM comments WHERE comments.post = p.id) AS comment_count, 
           u.picture, u.name
@@ -294,6 +295,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
