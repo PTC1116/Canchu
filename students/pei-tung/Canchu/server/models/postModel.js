@@ -1,5 +1,5 @@
-const mysql = require("mysql2");
-const errMsg = require("../../util/errorMessage");
+const mysql = require('mysql2');
+const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -30,7 +30,7 @@ module.exports = {
     }
   },
   checkPostExistenceById: async (conn, id) => {
-    const findTargetPost = "SELECT * FROM posts WHERE id = ?";
+    const findTargetPost = 'SELECT * FROM posts WHERE id = ?';
     const [result] = await conn.query(findTargetPost, [id]);
     if (result.length === 0) {
       return false;
@@ -42,13 +42,13 @@ module.exports = {
     try {
       const postExistence = await module.exports.checkPostExistenceById(
         conn,
-        postId
+        postId,
       );
       if (!postExistence) {
-        throw errMsg.generateMsg(403, "Post Not Found");
+        throw errMsg.generateMsg(403, 'Post Not Found');
       }
       const updateData =
-        "UPDATE posts SET context = ? WHERE id = ? AND posted_by = ?";
+        'UPDATE posts SET context = ? WHERE id = ? AND posted_by = ?';
       await conn.query(updateData, [context, postId, userId]);
       return postId;
     } catch (err) {
@@ -66,16 +66,16 @@ module.exports = {
     try {
       const postExistence = await module.exports.checkPostExistenceById(
         conn,
-        postId
+        postId,
       );
       if (!postExistence) {
-        throw errMsg.generateMsg(403, "Post Not Found");
+        throw errMsg.generateMsg(403, 'Post Not Found');
       }
       const isPostAlreadyLiked =
-        "SELECT * FROM likes WHERE like_user = ? AND post = ?";
+        'SELECT * FROM likes WHERE like_user = ? AND post = ?';
       const [result] = await conn.query(isPostAlreadyLiked, [userId, postId]);
       if (result.length > 0) {
-        throw errMsg.generateMsg(403, "Post Has Already Been Liked");
+        throw errMsg.generateMsg(403, 'Post Has Already Been Liked');
       }
       const insertData = `INSERT INTO likes (like_user, post) VALUE (?,?) ;`;
       await conn.query(insertData, [userId, postId, postId]);
@@ -95,12 +95,12 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const findTargetPost =
-        "SELECT * FROM likes WHERE like_user = ? AND post = ?";
+        'SELECT * FROM likes WHERE like_user = ? AND post = ?';
       const [result] = await conn.query(findTargetPost, [userId, postId]);
       if (result.length === 0) {
-        throw errMsg.generateMsg(403, "Like Not Found");
+        throw errMsg.generateMsg(403, 'Like Not Found');
       }
-      const deleteLike = "DELETE FROM likes WHERE like_user = ? AND post = ?";
+      const deleteLike = 'DELETE FROM likes WHERE like_user = ? AND post = ?';
       await conn.query(deleteLike, [userId, postId]);
       return postId;
     } catch (err) {
@@ -118,10 +118,10 @@ module.exports = {
     try {
       const postExistence = await module.exports.checkPostExistenceById(
         conn,
-        postId
+        postId,
       );
       if (!postExistence) {
-        throw errMsg.generateMsg(403, "Post Not Found");
+        throw errMsg.generateMsg(403, 'Post Not Found');
       }
       const insertData = `INSERT INTO comments (author,post,content,created_at) VALUES (?,?,?,now())`;
       const [result] = await conn.query(insertData, [userId, postId, content]);
@@ -136,31 +136,34 @@ module.exports = {
       await conn.release();
     }
   },
-  getPostDetail: async (postId) => {
+  getPostDetail: async (userId, postId) => {
     const conn = await pool.getConnection();
     try {
       const postExistence = await module.exports.checkPostExistenceById(
         conn,
-        postId
+        postId,
       );
       if (!postExistence) {
-        throw errMsg.generateMsg(403, "Post Not Found");
+        throw errMsg.generateMsg(403, 'Post Not Found');
       }
       const findPostOwner = `
       SELECT DISTINCT p.id AS postId, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
-      IF((SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked,
+      IF((SELECT COUNT(id) FROM likes WHERE like_user = ? AND post = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
-      u.picture, u.name 
+      u.id AS userId, u.picture, u.name 
       FROM users AS u
       INNER JOIN posts AS p ON u.id = p.posted_by
       LEFT JOIN likes AS l ON l.post = p.id
       LEFT JOIN comments AS c ON c.post = p.id
       WHERE p.id = ?;`;
-      const [[postOwnerData]] = await conn.query(findPostOwner, [postId]);
-      console.log(postOwnerData);
+      const [[postOwnerData]] = await conn.query(findPostOwner, [
+        userId,
+        postId,
+        postId,
+      ]);
       let result = {};
       result = {
         post: {
@@ -168,8 +171,9 @@ module.exports = {
           created_at: postOwnerData.created_at,
           context: postOwnerData.context,
           is_liked: postOwnerData.is_liked,
-          like_count: postOwnerData.comment_count,
+          like_count: postOwnerData.like_count,
           comment_count: postOwnerData.comment_count,
+          user_id: postOwnerData.userId,
           picture: postOwnerData.picture,
           name: postOwnerData.name,
           comments: [],
@@ -202,22 +206,21 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
-        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
       await conn.release();
     }
   },
-  getMyTimeline: async (id, itemsPerPage, cursor) => {
+  getMyTimeline: async (id, itemsPerQuery, cursor) => {
     const conn = await pool.getConnection();
     try {
-      const friendStatus = "friend";
+      const friendStatus = 'friend';
       const getMyTimeline = `
       SELECT DISTINCT p.id, u.id AS user_id, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
-      IF((SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked,
+      IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
       (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
       (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
       u.picture, u.name
@@ -243,33 +246,35 @@ module.exports = {
       LIMIT ?;`;
       const [myTimeline] = await conn.query(getMyTimeline, [
         id,
+        id,
         friendStatus,
         id,
         friendStatus,
         id,
         cursor,
-        itemsPerPage,
+        itemsPerQuery,
       ]);
       return myTimeline;
     } catch (err) {
+      console.log(err);
       throw errMsg.dbError;
     } finally {
       await conn.release();
     }
   },
-  getTimelineByUserId: async (id, itemsPerPage, cursor) => {
+  getTimelineByUserId: async (myId, targetId, itemsPerQuery, cursor) => {
     const conn = await pool.getConnection();
     try {
-      const checkUserExistence = "SELECT id FROM users WHERE id = ?";
-      const [userExistence] = await conn.query(checkUserExistence, [id]);
+      const checkUserExistence = 'SELECT id FROM users WHERE id = ?';
+      const [userExistence] = await conn.query(checkUserExistence, [targetId]);
       if (userExistence.length === 0) {
-        throw errMsg.generateMsg(403, "User Not Found");
+        throw errMsg.generateMsg(403, 'User Not Found');
       }
       const getTimelineByUserId = `
           SELECT DISTINCT p.id, u.id AS user_id, 
           DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
           p.context, 
-          IF ((SELECT COUNT(*) FROM likes WHERE likes.post = p.id) > 0, true, false) AS is_liked, 
+          IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
           (SELECT COUNT(*) FROM likes WHERE likes.post = p.id) as like_count,  
           (SELECT COUNT(*) FROM comments WHERE comments.post = p.id) AS comment_count, 
           u.picture, u.name
@@ -281,17 +286,18 @@ module.exports = {
           ORDER BY p.id DESC
           LIMIT ?;`;
       const publicUserTimeline = await conn.query(getTimelineByUserId, [
-        id,
+        myId,
+        targetId,
         cursor,
-        itemsPerPage,
+        itemsPerQuery,
       ]);
       return publicUserTimeline[0];
     } catch (err) {
-      if (err === errMes.clientError) {
-        throw errMes.clientError;
+      if (err.status === 403) {
+        throw err;
       } else {
         console.log(err);
-        throw errMes.serverError;
+        throw errMsg.dbError;
       }
     } finally {
       await conn.release();
@@ -300,7 +306,7 @@ module.exports = {
   countTotalPost: async () => {
     const conn = await pool.getConnection();
     try {
-      const query = "SELECT id FROM posts ORDER BY id DESC LIMIT 1;";
+      const query = 'SELECT id FROM posts ORDER BY id DESC LIMIT 1;';
       const [[result]] = await conn.query(query);
       return result.id;
     } catch (err) {

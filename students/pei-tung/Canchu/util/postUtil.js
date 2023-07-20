@@ -1,7 +1,10 @@
 module.exports = {
-  generatePostSearchObj: (arr) => {
+  generatePostSearchObj: (arr, itemsPerPage) => {
     let posts = [];
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < itemsPerPage; i++) {
+      if (arr[i] === undefined) {
+        return posts;
+      }
       const {
         id,
         user_id,
@@ -13,11 +16,6 @@ module.exports = {
         picture,
         name,
       } = arr[i];
-      if (arr[i].is_liked == 0) {
-        arr[i].is_liked = false;
-      } else {
-        arr[i].is_liked = true;
-      }
       const obj = {
         id,
         user_id,
