@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
+const { createClient } = require('redis');
 
 const app = express();
 const userRoutes = require('./server/routes/userRoute');
@@ -18,18 +19,15 @@ app.use('/api/1.0/friends', friendRoutes);
 app.use('/api/1.0/events', eventRoutes);
 app.use('/api/1.0/posts', postRoutes);
 
-const client = redis.createClient({
-  host: '127.0.0.1',
-  port: 6379,
-});
+const client = createClient();
 
-client.on('connect', () => {
-  console.log('Connected to Redis');
-});
+client.on('error', (err) => console.log('Redis Client Error', err));
 
-client.on('error', (err) => {
-  console.error('Redis error:', err);
-});
+await client.connect();
+console.log('connect success');
+await client.set('key', 'value');
+const value = await client.get('key');
+await client.disconnect();
 
 const port = 3000;
 app.listen(port, () => {
