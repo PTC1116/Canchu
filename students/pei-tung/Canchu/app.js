@@ -20,14 +20,7 @@ app.use('/api/1.0/events', eventRoutes);
 app.use('/api/1.0/posts', postRoutes);
 
 const client = createClient();
-
-client.on('connect', () => {
-  console.log('Connected to Redis');
-});
-
-client.on('error', (err) => {
-  console.error('Redis error:', err);
-});
+console.log(client);
 
 const port = 3000;
 app.listen(port, () => {
