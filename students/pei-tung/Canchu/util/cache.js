@@ -31,7 +31,6 @@ module.exports = {
       await client.connect();
       const key = module.exports.generateFriendshipKey(myId, targetId);
       const friendshipData = await client.get(key);
-      await client.disconnect();
       return JSON.parse(friendshipData);
     } catch (err) {
       throw errMsg.redisError;
