@@ -12,8 +12,8 @@ module.exports = {
   },
   getProfile: async (targetId) => {
     console.log('you are searching profile cache');
+    const client = redis.createClient();
     try {
-      const client = redis.createClient();
       await client.connect();
       const key = module.exports.generateProfileKey(targetId);
       const profileData = await client.get(key);
@@ -26,8 +26,8 @@ module.exports = {
   },
   getFriendship: async (myId, targetId) => {
     console.log('you are searching friendship cache');
+    const client = redis.createClient();
     try {
-      const client = redis.createClient();
       await client.connect();
       const key = module.exports.generateFriendshipKey(myId, targetId);
       const friendshipData = await client.get(key);
@@ -41,6 +41,7 @@ module.exports = {
   },
   saveProfile: async (obj) => {
     console.log('you are saving profile cache');
+    const client = redis.createClient();
     try {
       const { id, name, picture, introduction, tags } = obj;
       const profileCache = {
@@ -50,7 +51,6 @@ module.exports = {
         introduction,
         tags,
       };
-      const client = redis.createClient();
       await client.connect();
       const userId = obj.id;
       const key = module.exports.generateProfileKey(userId);
@@ -63,10 +63,10 @@ module.exports = {
   },
   saveFriendship: async (myId, targetId, obj) => {
     console.log('you are saving friendship cache');
+    const client = redis.createClient();
     try {
       const { friend_count, friendship } = obj;
       const friendshipCache = { friend_count, friendship };
-      const client = redis.createClient();
       await client.connect();
       const key = module.exports.generateFriendshipKey(myId, targetId);
       await client.set(key, JSON.stringify(friendshipCache));
@@ -78,8 +78,8 @@ module.exports = {
   },
   delete: async (cacheType, targetId, myId) => {
     console.log(`you are deleting ${cacheType}`);
+    const client = redis.createClient();
     try {
-      const client = redis.createClient();
       await client.connect();
       let key;
       if (cacheType === 'profile') {
