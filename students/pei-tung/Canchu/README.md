@@ -9,3 +9,8 @@
    - 為 userPictureUpdate 與 userProfileUpdate 新增了清除 Cache 的功能
    - 為 friend delete, agree, request 新增了清除 Cache 的功能
    - 配合 Cache 所需的參數在 userModel 新增了能回傳 _兩個用戶的關係_ 以及 _用戶好友數_ 的 getFriendship 功能；也修改了 friendModel 的 delete 功能，使其回傳被刪除好友的人的 id 以清除 Cache
+
+#### 待辦事項
+
+- 搞清楚 Node-Redis 的 async/await
+- Cache User's Post Data
