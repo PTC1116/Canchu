@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv').config();
 const errMsg = require('../../util/errorMessage');
+const cache = require('../../util/cache');
 
 module.exports = {
   signUp: async (req, res) => {
@@ -108,12 +109,38 @@ module.exports = {
     try {
       const targetId = req.params.id;
       const myId = req.userData.id;
-      const user = await userModel.userProfile(myId, targetId);
-      const successRes = {
-        data: {
-          user,
-        },
-      };
+      const profileCache = await cache.getProfile(targetId);
+      const friendshipCache = await cache.getFriendship(myId, targetId);
+      console.log(friendshipCache);
+      console.log(profileCache);
+      let successRes;
+      if (profileCache && friendshipCache) {
+        successRes = {
+          data: {
+            user: { ...profileCache, friendship: { ...friendshipCache } },
+          },
+        };
+      } else if (profileCache && !friendshipCache) {
+        const friendship = await userModel.getFriendship(myId, targetId);
+        successRes = {
+          data: {
+            user: {
+              ...profileCache,
+              ...friendship,
+            },
+          },
+        };
+        cache.saveFriendship(myId, targetId, successRes.data.user);
+      } else if (!profileCache && !friendshipCache) {
+        const user = await userModel.userProfile(myId, targetId);
+        successRes = {
+          data: {
+            user,
+          },
+        };
+        cache.saveProfile(successRes.data.user);
+        cache.saveFriendship(myId, targetId, successRes.data.user);
+      }
       res.status(200).send(successRes);
     } catch (err) {
       console.log(err);
@@ -134,6 +161,7 @@ module.exports = {
           picture: updatedPicUrl,
         },
       };
+      cache.delete('profile', id);
       return res.status(200).send(successRes);
     } catch (err) {
       console.log(err);
@@ -159,6 +187,7 @@ module.exports = {
           },
         },
       };
+      cache.delete('profile', id);
       return res.status(200).send(successRes);
     } catch (err) {
       console.log(err);

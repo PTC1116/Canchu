@@ -162,48 +162,18 @@ module.exports = {
       if (friendshipExistence.length === 0) {
         throw errMsg.generateMsg(403, 'Friendship Not Found');
       }
+      let targetId;
+      if (friendshipExistence[0].requester_id === uId) {
+        targetId = friendshipExistence[0].receiver_id;
+      } else if (friendshipExistence[0].receiver_id === uId) {
+        targetId = friendshipExistence[0].requester_id;
+      }
       const deleteFriendshipById = `
       DELETE from friends
       WHERE (id = ? AND requester_id = ?) 
       OR (id = ? AND receiver_id = ?)`;
       await conn.query(deleteFriendshipById, [fId, uId, fId, uId]);
-      return fId;
-      /*
-      const invitationStatus = 'requested';
-      const findInvitation =
-        'SELECT * FROM friends WHERE id = ? AND requester_id = ? AND status = ?';
-      const findResult = await conn.query(findInvitation, [
-        fId,
-        uId,
-        invitationStatus,
-      ]);
-      // withdraw invitation
-      if (findResult[0].length > 0) {
-        const withdrawInvitation =
-          'DELETE from friends WHERE id = ? AND requester_id = ? AND status = ?';
-        const a = await conn.query(withdrawInvitation, [
-          fId,
-          uId,
-          invitationStatus,
-        ]);
-        return fId;
-      } else {
-        const findFriendship =
-          'SELECT * FROM friends WHERE (id = ? AND requester_id = ?) OR (id = ? AND receiver_id= ?)';
-        const findFriendshipResult = await conn.query(findFriendship, [
-          fId,
-          uId,
-          fId,
-          uId,
-        ]);
-        if (findFriendshipResult[0].length === 0) {
-          throw errMes.clientError;
-        }
-        const deleteFriend =
-          'DELETE FROM friends WHERE (id = ? AND requester_id = ?) OR (id = ? AND receiver_id= ?)';
-        await conn.query(deleteFriend, [fId, uId, fId, uId]);
-        return fId;
-      }*/
+      return { targetId, fId };
     } catch (err) {
       if (err.status === 403) {
         throw err;
