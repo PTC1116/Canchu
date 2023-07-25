@@ -10,7 +10,7 @@ const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
 
 app.set('trust proxy', true);
-app.use('/api/1.0/*', rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
+app.use(rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
 
 app.use(cors());
 app.use(express.json());
