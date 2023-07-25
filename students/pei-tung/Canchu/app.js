@@ -10,7 +10,8 @@ const postRoutes = require('./server/routes/postRoutes');
 
 app.set('trust proxy', true);
 app.use('/api/1.0/*', (req, res) => {
-  const clientIP = req.connection.remoteAddress;
+  console.log(req.socket.remoteAddress);
+  const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   console.log(`Your IP address is: ${clientIP}`);
 });
 
