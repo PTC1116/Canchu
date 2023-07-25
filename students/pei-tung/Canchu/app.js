@@ -8,6 +8,12 @@ const friendRoutes = require('./server/routes/friendRoute');
 const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
 
+app.set('trust proxy', true);
+app.use('/api/1.0/*', (req, res) => {
+  const clientIP = req.connection.remoteAddress;
+  console.log(`Your IP address is: ${clientIP}`);
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
