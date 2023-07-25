@@ -109,6 +109,7 @@ module.exports = {
     try {
       const targetId = req.params.id;
       const myId = req.userData.id;
+      // 改成只要有缺就重新撈資料
       const profileCache = await cache.getProfile(targetId);
       const friendshipCache = await cache.getFriendship(myId, targetId);
       console.log(friendshipCache);
@@ -120,18 +121,7 @@ module.exports = {
             user: { ...profileCache, friendship: { ...friendshipCache } },
           },
         };
-      } else if (profileCache && !friendshipCache) {
-        const friendship = await userModel.getFriendship(myId, targetId);
-        successRes = {
-          data: {
-            user: {
-              ...profileCache,
-              ...friendship,
-            },
-          },
-        };
-        cache.saveFriendship(myId, targetId, successRes.data.user);
-      } else if (!profileCache && !friendshipCache) {
+      } else {
         const user = await userModel.userProfile(myId, targetId);
         successRes = {
           data: {

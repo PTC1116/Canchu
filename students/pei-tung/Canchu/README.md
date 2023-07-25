@@ -1,16 +1,34 @@
 ## My sever Ip: 13.211.10.154
 
-#### Build Cache Mechanism
+#### Build A Rate Limiter With Redis
 
-1. Cache User's Profile
-   - 將 Cache 分成了 **profile** 與 **friendship** 兩部分
-     - profile 的 namespace：profile\_`被看的用戶id`，儲存的資料型態為 string
-     - friendship 的 namespace：friendship\_`看人的用戶 id_被看的用戶 id`，儲存的資料型態為 string
-   - 為 userPictureUpdate 與 userProfileUpdate 新增了清除 Cache 的功能
-   - 為 friend delete, agree, request 新增了清除 Cache 的功能
-   - 配合 Cache 所需的參數在 userModel 新增了能回傳 _兩個用戶的關係_ 以及 _用戶好友數_ 的 getFriendship 功能；也修改了 friendModel 的 delete 功能，使其回傳被刪除好友的人的 id 以清除 Cache
+1. 獲取用戶 ip 位置：`req.headers['x-forwarded-for']`
 
-#### 待辦事項
+   - 修改 Nginx 設定，要求反向代理器將用戶 ip 塞入 req.header
 
-- 搞清楚 Node-Redis 的 async/await
-- Cache User's Post Data
+   ```
+   location /{
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+   ```
+
+1. redis 儲存：
+
+   - 將`用戶ip`作為 key，`用戶每分鐘訪問次數`設為 value
+   - 一秒後刪除快取
+   - 功能：同一用戶在一秒內只能發送十個 request
+
+1. 設置黑名單
+   - 功能：讓把 rate limiter 打爆的用戶在一定時間（目前定 5 分鐘）內不可以再發 request
+   - 黑名單在 redis 內的 prefix 是 `block_list:` ，資料型態為 SET，儲存的 value 為被黑名單的 user IP，TTL 為五分鐘
+
+#### 其他處理方式
+
+- 使用 express-rate-limit 套件
+- nginx 本身也能設置 rate limit
+
+#### 其他修改：Cache User's Profile
+
+- 修改了 user controller 的邏輯：一但 profile 或 friendship 的 Cache 少了一個，就會全部進 db 重撈資料

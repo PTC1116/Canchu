@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
+const rateLimiter = require('./util/rateLimiter');
 
 const app = express();
 const userRoutes = require('./server/routes/userRoute');
@@ -9,13 +10,7 @@ const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
 
 app.set('trust proxy', true);
-app.use('/api/1.0/*', (req, res, next) => {
-  console.log(req.headers);
-  console.log(req.socket);
-  const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  console.log(`Your IP address is: ${clientIP}`);
-  next();
-});
+app.use('/api/1.0/*', rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
 
 app.use(cors());
 app.use(express.json());
