@@ -9,10 +9,11 @@ const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
 
 app.set('trust proxy', true);
-app.use('/api/1.0/*', (req, res) => {
-  console.log(req.socket.remoteAddress);
+app.use('/api/1.0/*', (req, res, next) => {
+  console.log(req.header);
   const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   console.log(`Your IP address is: ${clientIP}`);
+  next();
 });
 
 app.use(cors());
