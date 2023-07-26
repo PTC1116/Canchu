@@ -21,7 +21,4 @@ app.use('/api/1.0/friends', friendRoutes);
 app.use('/api/1.0/events', eventRoutes);
 app.use('/api/1.0/posts', postRoutes);
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-});
+module.exports = app;

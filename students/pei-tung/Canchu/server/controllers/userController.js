@@ -59,12 +59,12 @@ module.exports = {
         throw errMsg.invaildHeader;
       }
       const { provider } = req.body;
-      if (!provider) {
+      if (!provider || !provider.trim()) {
         throw errMsg.generateMsg(400, 'Sign In Failed: Provider Field Missing');
       }
       if (provider === 'native') {
         const { email, password } = req.body;
-        if (!email || !password) {
+        if (!email || !email.trim() || !password || !password.trim()) {
           throw errMsg.generateMsg(
             400,
             'Sign In Failed: Please fill out all fields',
