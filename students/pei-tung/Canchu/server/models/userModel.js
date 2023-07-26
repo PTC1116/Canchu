@@ -244,6 +244,61 @@ module.exports = {
       await conn.release();
     }
   },
+  getFriendship: async (myId, targetId) => {
+    console.log('you are searching friendship in db');
+    const conn = await pool.getConnection();
+    try {
+      let result = {};
+      const friendStatus = 'friend';
+      const countAllFriends = `SELECT COUNT(id) AS friendCount FROM friends 
+        WHERE (requester_id = ? AND status = ?) 
+        OR (receiver_id = ? AND status = ?)`;
+      const [[friendCount]] = await conn.query(countAllFriends, [
+        targetId,
+        friendStatus,
+        targetId,
+        friendStatus,
+      ]);
+      console.log(friendCount);
+      result.friend_count = friendCount.friendCount;
+      const findFriendshipStatus = `
+      SELECT id, receiver_id, status FROM friends
+      WHERE (requester_id = ? AND receiver_id = ?) 
+      OR (requester_id = ? AND receiver_id = ?)`;
+      const [friendshipStatus] = await conn.query(findFriendshipStatus, [
+        myId,
+        targetId,
+        targetId,
+        myId,
+      ]);
+      if (friendshipStatus.length === 0) {
+        result.friendship = null;
+      } else if (
+        friendshipStatus[0].receiver_id === myId &&
+        friendshipStatus[0].status === 'requested'
+      ) {
+        result.friendship = {
+          id: friendshipStatus[0].id,
+          status: 'pending',
+        };
+      } else {
+        result.friendship = {
+          id: friendshipStatus[0].id,
+          status: friendshipStatus[0].status,
+        };
+      }
+      return result;
+    } catch (err) {
+      if (err.status === 403) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
+    } finally {
+      await conn.release();
+    }
+  },
 };
 
 // 也可以 module.exports{ a: function()=>{}, b:function() => {module.exports.a()}}

@@ -2,6 +2,7 @@ const errorMes = require('../../util/errorMessage');
 const friendUtil = require('../../util/friendUtil');
 const friendModel = require('../models/friendModel');
 const eventModel = require('../models/eventModel');
+const cache = require('../../util/cache');
 module.exports = {
   showAllFriends: async (req, res) => {
     try {
@@ -53,6 +54,8 @@ module.exports = {
           },
         },
       };
+      cache.delete('friendship', requesterId, receiverId);
+      cache.delete('friendship', receiverId, requesterId);
       return res.status(200).send(successRes);
     } catch (err) {
       console.log(err);
@@ -79,6 +82,8 @@ module.exports = {
           },
         },
       };
+      cache.delete('friendship', userId, notifReceiverId);
+      cache.delete('friendship', notifReceiverId, userId);
       res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
@@ -90,7 +95,10 @@ module.exports = {
       const friendshipId = req.params.friendship_id * 1;
       const userId = req.userData.id;
       const id = await friendModel.delete(userId, friendshipId);
-      const successObj = { data: { friendship: { id } } };
+      const successObj = { data: { friendship: { id: id.fId } } };
+      const targetId = id.targetId;
+      cache.delete('friendship', userId, targetId);
+      cache.delete('friendship', targetId, userId);
       return res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
