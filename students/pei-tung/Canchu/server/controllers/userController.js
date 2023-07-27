@@ -118,7 +118,7 @@ module.exports = {
       if (profileCache && friendshipCache) {
         successRes = {
           data: {
-            user: { ...profileCache, friendship: { ...friendshipCache } },
+            user: { ...profileCache, ...friendshipCache },
           },
         };
       } else {
