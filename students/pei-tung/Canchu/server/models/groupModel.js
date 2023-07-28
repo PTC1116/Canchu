@@ -154,15 +154,40 @@ module.exports = {
       conn.release();
     }
   },
-  /*post: async (userId, groupid, context) => {
+  post: async (groupId, userId, context) => {
     const conn = await pool.getConnection();
     try {
-      const checkUserStatus = `'SELECT id FROM group_members WHERE (user_id = ? AND status = 'member') OR (user_id = ? AND status = 'creator')`;
+      const checkUserStatus = `
+      SELECT id FROM group_members 
+      WHERE (user_id = ? AND group_id = ? AND status = 'member') 
+      OR (user_id = ? AND group_id = ? AND status = 'creator')`;
+      const [userStatus] = await conn.query(checkUserStatus, [
+        userId,
+        groupId,
+        userId,
+        groupId,
+      ]);
+      if (userStatus.length === 0) {
+        throw errMsg.generateMsg(
+          400,
+          'You Do Not have Permission To Perform This Action',
+        );
+      }
+      const insertPost =
+        'INSERT INTO group_posts (group_id, user_id,context) VALUES (?,?,?)';
+      const [post] = await conn.query(insertPost, [groupId, userId, context]);
+      return { groupId, userId, postId: post.insertId };
     } catch (err) {
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
     } finally {
       conn.release();
     }
-  },*/
+  },
   /* 
     const conn = await pool.getConnection();
     try{}catch(err){}finally{conn.release()

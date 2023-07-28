@@ -12,5 +12,5 @@ router.post(
   auth.auth,
   controller.agreeJoinReq,
 );
-// router.post('/:group_id/post', auth.auth, controller.post);
+router.post('/:group_id/post', auth.auth, controller.post);
 module.exports = router;

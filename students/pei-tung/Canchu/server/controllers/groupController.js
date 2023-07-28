@@ -10,7 +10,7 @@ module.exports = {
         throw errMsg.invaildHeader;
       }
       const creatorId = req.userData.id;
-      const { name: groupName } = req.body;
+      const groupName = req.body.name;
       if (!groupName || !groupName.trim()) {
         throw errMsg.generateMsg(400, 'Please Name Your Group');
       }
@@ -101,9 +101,7 @@ module.exports = {
       return res.status(err.status).send({ error: err.error });
     }
   },
-};
-
-/*post: async (req, res) => {
+  post: async (req, res) => {
     try {
       const header = req.get('Content-Type');
       if (header !== 'application/json') {
@@ -111,12 +109,28 @@ module.exports = {
       }
       const userId = req.userData.id;
       const groupId = req.params.group_id * 1;
-      const { context } = req.body;
-      await model.post(userId, groupId, context);
-
-      // res.status(200).send(successObj);
+      const context = req.body.context;
+      if (!context || !context.trim()) {
+        throw errMsg.generateMsg(403, 'Post Context Cannot Be Blank');
+      }
+      const result = await model.post(groupId, userId, context);
+      const successObj = {
+        data: {
+          group: {
+            id: result.groupId,
+          },
+          user: {
+            id: result.userId,
+          },
+          post: {
+            id: result.postId,
+          },
+        },
+      };
+      res.status(200).send(successObj);
     } catch (err) {
       console.log(err);
       return res.status(err.status).send({ error: err.error });
     }
-  },*/
+  },
+};
