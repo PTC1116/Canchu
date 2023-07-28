@@ -32,7 +32,7 @@ module.exports = {
   viewAllMsg: async (req, res) => {
     const targetId = req.params.user_id * 1;
     const myId = req.userData.id;
-    const itemsPerPage = 3; //要改這個
+    const itemsPerPage = 10; //要改這個
     const itemsPerQuery = itemsPerPage + 1;
     let cursorStr = req.query.cursor;
     if (cursorStr) {
