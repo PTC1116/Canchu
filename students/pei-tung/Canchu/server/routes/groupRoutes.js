@@ -7,4 +7,10 @@ router.post('/', auth.auth, controller.createGroup);
 router.delete('/:group_id', auth.auth, controller.delGroup);
 router.post('/:group_id/join', auth.auth, controller.joinGroup);
 router.get('/:group_id/member/pending', auth.auth, controller.getPendingList);
+router.post(
+  '/:group_id/member/:user_id/agree',
+  auth.auth,
+  controller.agreeJoinReq,
+);
+// router.post('/:group_id/post', auth.auth, controller.post);
 module.exports = router;

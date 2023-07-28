@@ -66,8 +66,9 @@ module.exports = {
   },
   getPendingList: async (req, res) => {
     try {
+      const userId = req.userData.id;
       const groupId = req.params.group_id * 1;
-      const result = await model.getPendingList(groupId);
+      const result = await model.getPendingList(groupId, userId);
       const users = util.generatePendingObj(result);
       const successObj = {
         data: {
@@ -81,4 +82,41 @@ module.exports = {
       return res.status(err.status).send({ error: err.error });
     }
   },
+  agreeJoinReq: async (req, res) => {
+    try {
+      const userId = req.userData.id;
+      const groupId = req.params.group_id * 1;
+      const requesterId = req.params.user_id * 1;
+      const id = await model.agreeJoinReq(groupId, userId, requesterId);
+      const successObj = {
+        data: {
+          group: {
+            id,
+          },
+        },
+      };
+      res.status(200).send(successObj);
+    } catch (err) {
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
+    }
+  },
 };
+
+/*post: async (req, res) => {
+    try {
+      const header = req.get('Content-Type');
+      if (header !== 'application/json') {
+        throw errMsg.invaildHeader;
+      }
+      const userId = req.userData.id;
+      const groupId = req.params.group_id * 1;
+      const { context } = req.body;
+      await model.post(userId, groupId, context);
+
+      // res.status(200).send(successObj);
+    } catch (err) {
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
+    }
+  },*/

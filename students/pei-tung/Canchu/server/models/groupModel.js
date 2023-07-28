@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 const errMsg = require('../../util/errorMessage');
+const { agree } = require('./friendModel');
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -91,25 +92,79 @@ module.exports = {
       conn.release();
     }
   },
-  getPendingList: async (groupId) => {
+  getPendingList: async (groupId, userId) => {
     const conn = await pool.getConnection();
     try {
+      const checkUserStatus =
+        'SELECT * FROM user_groups WHERE id = ? AND creator = ?';
+      const [status] = await conn.query(checkUserStatus, [groupId, userId]);
+      if (status.length === 0) {
+        throw errMsg.generateMsg(
+          400,
+          'You Do Not have Permission To Perform This Action',
+        );
+      }
       const findPendingUser = `SELECT users.id AS id, name, picture, status 
         FROM users INNER JOIN group_members ON users.id = group_members.user_id 
         WHERE group_members.group_id = ? AND status = "pending";`;
       const [result] = await conn.query(findPendingUser, [groupId]);
       return result;
     } catch (err) {
-      console.log(err);
-      throw errMsg.dbError;
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
     } finally {
       conn.release();
     }
-
-    return 'pendlist';
   },
-  /* async(groupName, userid) => {
+  agreeJoinReq: async (groupId, userId, requesterId) => {
     const conn = await pool.getConnection();
-    try{}catch(err){}finally{conn.release()}
+    try {
+      const checkUserStatus =
+        'SELECT * FROM user_groups WHERE id = ? AND creator = ?';
+      const [status] = await conn.query(checkUserStatus, [groupId, userId]);
+      if (status.length === 0) {
+        throw errMsg.generateMsg(
+          400,
+          'You Do Not have Permission To Perform This Action',
+        );
+      }
+      const checkReqStatus = `SELECT * FROM group_members WHERE group_id = ? AND user_id = ? AND status = "pending"`;
+      const [reqStatus] = await conn.query(checkReqStatus, [
+        groupId,
+        requesterId,
+      ]);
+      if (reqStatus.length === 0) {
+        throw errMsg.generateMsg(400, 'Request Not Found');
+      }
+      const agreeReq = `UPDATE group_members SET status = "member" WHERE group_id = ? AND user_id = ?`;
+      await conn.query(agreeReq, [groupId, requesterId]);
+      return groupId;
+    } catch (err) {
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
+    } finally {
+      conn.release();
+    }
+  },
+  /*post: async (userId, groupid, context) => {
+    const conn = await pool.getConnection();
+    try {
+      const checkUserStatus = `'SELECT id FROM group_members WHERE (user_id = ? AND status = 'member') OR (user_id = ? AND status = 'creator')`;
+    } catch (err) {
+    } finally {
+      conn.release();
+    }
+  },*/
+  /* 
+    const conn = await pool.getConnection();
+    try{}catch(err){}finally{conn.release()
   },*/
 };
