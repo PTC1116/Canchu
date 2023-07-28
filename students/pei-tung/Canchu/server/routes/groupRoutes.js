@@ -13,4 +13,5 @@ router.post(
   controller.agreeJoinReq,
 );
 router.post('/:group_id/post', auth.auth, controller.post);
+router.get('/:group_id/posts', auth.auth, controller.getAllPost);
 module.exports = router;

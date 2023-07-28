@@ -133,4 +133,7 @@ module.exports = {
       return res.status(err.status).send({ error: err.error });
     }
   },
+  getAllPost: async (req, res) => {
+    res.send(model.getAllPost());
+  },
 };

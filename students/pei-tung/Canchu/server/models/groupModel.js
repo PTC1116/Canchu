@@ -174,7 +174,7 @@ module.exports = {
         );
       }
       const insertPost =
-        'INSERT INTO group_posts (group_id, user_id,context) VALUES (?,?,?)';
+        'INSERT INTO group_posts (group_id, user_id,context,created_at) VALUES (?,?,?,now())';
       const [post] = await conn.query(insertPost, [groupId, userId, context]);
       return { groupId, userId, postId: post.insertId };
     } catch (err) {
@@ -187,6 +187,9 @@ module.exports = {
     } finally {
       conn.release();
     }
+  },
+  getAllPost: async () => {
+    return 'all posts';
   },
   /* 
     const conn = await pool.getConnection();
