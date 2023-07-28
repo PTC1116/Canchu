@@ -57,13 +57,15 @@ module.exports = {
         DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
         users.id AS userId, name, picture
         FROM users INNER JOIN messages ON users.id = messages.sender 
-        WHERE (sender = ? AND messages.id < ?) OR (sender = ? AND messages.id < ?)
+        WHERE (sender = ? AND receiver = ? AND messages.id < ?) OR (sender = ? AND receiver = ? AND messages.id < ?)
         ORDER BY messages.id DESC
         LIMIT ?`;
       const [result] = await conn.query(findAllMsg, [
         myId,
+        targetId,
         cursor,
         targetId,
+        myId,
         cursor,
         itemsPerQuery,
       ]);
