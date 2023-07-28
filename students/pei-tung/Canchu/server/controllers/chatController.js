@@ -1,5 +1,6 @@
 const errMsg = require('../../util/errorMessage');
 const model = require('../models/chatModels');
+const util = require('../../util/chatUtil');
 
 module.exports = {
   sendMsg: async (req, res) => {
@@ -18,7 +19,7 @@ module.exports = {
       const successObj = {
         data: {
           message: {
-            id: 1,
+            id,
           },
         },
       };
@@ -27,5 +28,33 @@ module.exports = {
       console.log(err);
       return res.status(err.status).send({ error: err.error });
     }
+  },
+  viewAllMsg: async (req, res) => {
+    const targetId = req.params.user_id * 1;
+    const myId = req.userData.id;
+    const itemsPerPage = 3; //要改這個
+    const itemsPerQuery = itemsPerPage + 1;
+    let cursorStr = req.query.cursor;
+    if (cursorStr) {
+      cursor = Buffer.from(cursorStr, 'base64').toString('utf-8');
+    } else {
+      const result = await model.findNewestPost();
+      cursor = result.id + 1;
+    }
+    const allMsg = await model.viewAllMsg(
+      myId,
+      targetId,
+      itemsPerQuery,
+      cursor,
+    );
+    const messages = util.generateAllMsgObj(allMsg, itemsPerPage);
+    if (allMsg.length < itemsPerQuery) {
+      successObj = { data: { messages, next_cursor: null } };
+    } else {
+      const nextPageIndex = messages[messages.length - 1].id;
+      let nextCursor = Buffer.from(nextPageIndex.toString()).toString('base64');
+      successObj = { data: { messages, next_cursor: nextCursor } };
+    }
+    res.status(200).send(successObj);
   },
 };

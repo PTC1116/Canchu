@@ -4,5 +4,5 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/:user_id', auth.auth, controller.sendMsg);
-// router.get('/:user_id/messages', auth.auth, controller.);
+router.get('/:user_id/messages', auth.auth, controller.viewAllMsg);
 module.exports = router;

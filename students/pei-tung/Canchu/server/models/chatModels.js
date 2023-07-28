@@ -19,7 +19,6 @@ const pool = setPool.promise();
 
 module.exports = {
   sendMsg: async (myId, receiverId, msg) => {
-    // 檢查兩個用戶都存在？
     const conn = await pool.getConnection();
     try {
       const checkReceiverStatus = 'SELECT id FROM users WHERE id = ?';
@@ -40,6 +39,56 @@ module.exports = {
         console.log(err);
         throw errMsg.dbError;
       }
+    } finally {
+      conn.release();
+    }
+  },
+  viewAllMsg: async (myId, targetId, itemsPerQuery, cursor) => {
+    const conn = await pool.getConnection();
+    try {
+      const checkReceiverStatus = 'SELECT id FROM users WHERE id = ?';
+      const [receiverStatus] = await conn.query(checkReceiverStatus, [
+        targetId,
+      ]);
+      if (receiverStatus.length === 0) {
+        throw errMsg.generateMsg(400, 'User Not Found');
+      }
+      const findAllMsg = `SELECT messages.id AS id, message, 
+        DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
+        users.id AS userId, name, picture
+        FROM users INNER JOIN messages ON users.id = messages.sender 
+        WHERE (sender = ? AND messages.id < ?) OR (sender = ? AND messages.id < ?)
+        ORDER BY messages.id DESC
+        LIMIT ?`;
+      const [result] = await conn.query(findAllMsg, [
+        myId,
+        cursor,
+        targetId,
+        cursor,
+        itemsPerQuery,
+      ]);
+      return result;
+    } catch (err) {
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
+    } finally {
+      conn.release();
+    }
+  },
+  findNewestPost: async () => {
+    const conn = await pool.getConnection();
+    try {
+      const findNewestPost =
+        'SELECT id FROM messages ORDER BY messages.id DESC LIMIT 1';
+      const [[newestId]] = await conn.query(findNewestPost);
+      return newestId;
+    } catch (err) {
+      console.log(err);
+      throw errMsg.dbError;
     } finally {
       conn.release();
     }
