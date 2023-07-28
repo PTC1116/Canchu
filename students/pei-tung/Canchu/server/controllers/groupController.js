@@ -90,7 +90,7 @@ module.exports = {
       const id = await model.agreeJoinReq(groupId, userId, requesterId);
       const successObj = {
         data: {
-          group: {
+          user: {
             id,
           },
         },

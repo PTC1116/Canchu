@@ -150,7 +150,7 @@ module.exports = {
       }
       const agreeReq = `UPDATE group_members SET status = "member" WHERE group_id = ? AND user_id = ?`;
       await conn.query(agreeReq, [groupId, requesterId]);
-      return groupId;
+      return userId;
     } catch (err) {
       if (err.status === 400) {
         throw err;
