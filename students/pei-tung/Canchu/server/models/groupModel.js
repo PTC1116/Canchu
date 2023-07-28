@@ -188,7 +188,48 @@ module.exports = {
       conn.release();
     }
   },
-  getAllPost: async () => {
+  getAllPosts: async (groupId, userId) => {
+    const conn = await pool.getConnection();
+    try {
+      const checkUserStatus = `
+      SELECT id FROM group_members 
+      WHERE (user_id = ? AND group_id = ? AND status = 'member') 
+      OR (user_id = ? AND group_id = ? AND status = 'creator')`;
+      const [userStatus] = await conn.query(checkUserStatus, [
+        userId,
+        groupId,
+        userId,
+        groupId,
+      ]);
+      if (userStatus.length === 0) {
+        throw errMsg.generateMsg(
+          400,
+          'You Do Not have Permission To Perform This Action',
+        );
+      }
+      const getAllPost = `
+      SELECT group_posts.id AS id, users.id AS user_id, 
+      DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at, context, picture, name 
+      FROM users INNER JOIN group_posts ON users.id = group_posts.user_id 
+      WHERE group_posts.group_id = ?
+      ORDER BY group_posts.id DESC`;
+      const [posts] = await conn.query(getAllPost, [groupId]);
+      return posts;
+    } catch (err) {
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
+    } finally {
+      conn.release();
+    }
+    /*`SELECT group_posts.id AS id, users.id AS user_id, created_at, context, picture,name 
+        FROM users INNER JOIN group_posts ON users.id = group_posts.user_id 
+        WHERE group_posts.group_id = ?
+        ORDER BY group_posts.id DESC
+        ;`*/
     return 'all posts';
   },
   /* 

@@ -134,6 +134,16 @@ module.exports = {
     }
   },
   getAllPost: async (req, res) => {
-    res.send(model.getAllPost());
+    try {
+      const userId = req.userData.id;
+      const groupId = req.params.group_id * 1;
+      const result = await model.getAllPosts(groupId, userId);
+      const posts = util.generatePostObj(result);
+      const successObj = { data: { posts } };
+      res.status(200).send(successObj);
+    } catch (err) {
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
+    }
   },
 };
