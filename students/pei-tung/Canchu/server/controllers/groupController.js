@@ -45,4 +45,22 @@ module.exports = {
       return res.status(err.status).send({ error: err.error });
     }
   },
+  joinGroup: async (req, res) => {
+    try {
+      const userId = req.userData.id;
+      const groupId = req.params.group_id * 1;
+      const id = await model.joinGroup(groupId, userId);
+      const successObj = {
+        data: {
+          group: {
+            id,
+          },
+        },
+      };
+      res.status(200).send(successObj);
+    } catch (err) {
+      console.log(err);
+      return res.status(err.status).send({ error: err.error });
+    }
+  },
 };

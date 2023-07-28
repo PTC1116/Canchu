@@ -33,7 +33,6 @@ module.exports = {
   delGroup: async (groupId, userId) => {
     const conn = await pool.getConnection();
     try {
-      console.log(userId);
       const findGroup =
         'SELECT * from user_groups WHERE id = ? AND creator = ?';
       const [groupData] = await conn.query(findGroup, [groupId, userId]);
@@ -57,7 +56,38 @@ module.exports = {
     } finally {
       conn.release();
     }
-    // 'DELETE from users_groups WHERE id = ? AND creator = ?';
+  },
+  joinGroup: async (groupId, userId) => {
+    const conn = await pool.getConnection();
+    try {
+      const checkUserId =
+        'SELECT * from user_groups WHERE id = ? AND creator = ?';
+      const [result] = await conn.query(checkUserId, [groupId, userId]);
+      if (result.length > 0) {
+        throw errMsg.generateMsg(
+          400,
+          'You Do Not have Permission To Perform This Action',
+        );
+      }
+      const checkUserStatus =
+        'SELECT * from group_members WHERE group_id = ? AND user_id = ?';
+      const [status] = await conn.query(checkUserStatus, [groupId, userId]);
+      if (status.length > 0) {
+        throw errMsg.generateMsg(400, 'Your Request Is Still Pending');
+      }
+      const insertMemberData = `INSERT INTO group_members (group_id, user_id,status) VALUES (?,?,'pending')`;
+      await conn.query(insertMemberData, [groupId, userId]);
+      return groupId;
+    } catch (err) {
+      if (err.status === 400) {
+        throw err;
+      } else {
+        console.log(err);
+        throw errMsg.dbError;
+      }
+    } finally {
+      conn.release();
+    }
   },
   /* async(groupName, userid) => {
     const conn = await pool.getConnection();
