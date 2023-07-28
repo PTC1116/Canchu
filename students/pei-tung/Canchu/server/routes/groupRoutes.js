@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../../util/auth');
 const controller = require('../controllers/groupController');
 
-router.get('/', auth.auth, controller.createGroup);
+router.post('/', auth.auth, controller.createGroup);
+router.delete('/:group_id', auth.auth, controller.delGroup);
 
 module.exports = router;
