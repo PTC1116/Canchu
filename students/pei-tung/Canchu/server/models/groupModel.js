@@ -23,6 +23,8 @@ module.exports = {
     try {
       const insertData = 'INSERT INTO user_groups (name, creator) VALUES (?,?)';
       const [result] = await conn.query(insertData, [groupName, userId]);
+      const insertToMember = `INSERT INTO group_members (group_id, user_id,status) VALUES (?,?,'creator')`;
+      await conn.query(insertToMember, [result.insertId, userId]);
       return result.insertId;
     } catch (err) {
       throw errMsg.dbError;

@@ -66,7 +66,6 @@ module.exports = {
   },
   getPendingList: async (req, res) => {
     try {
-      // const userId = req.userData.id;
       const groupId = req.params.group_id * 1;
       const result = await model.getPendingList(groupId);
       const users = util.generatePendingObj(result);
