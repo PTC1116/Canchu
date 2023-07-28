@@ -9,7 +9,7 @@ module.exports = {
         req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       const maxRequestsPerSec = 10;
       const cacheTTL = 1;
-      const blockListTTL = 300; //300;
+      const blockListTTL = 300;
       await client.connect();
       const key = clientIP;
       const userVisitCount = await client.get(key);
@@ -22,7 +22,6 @@ module.exports = {
         throw errMsg.generateMsg(429, 'Too Many Request');
       }
       if (!userVisitCount) {
-        console.log('adding value');
         await client.set(key, 1, { EX: cacheTTL, NX: true });
       } else {
         await client.incr(key);
@@ -31,7 +30,6 @@ module.exports = {
       if (err.status === 429) {
         return res.status(err.status).send({ err: err.error });
       } else {
-        console.log(err);
         return res
           .status(errMsg.redisError.status)
           .send({ err: errMsg.redisError.error });
