@@ -89,6 +89,23 @@ module.exports = {
       conn.release();
     }
   },
+  getPendingList: async (groupId) => {
+    const conn = await pool.getConnection();
+    try {
+      const findPendingUser = `SELECT users.id AS id, name, picture, status 
+        FROM users INNER JOIN group_members ON users.id = group_members.user_id 
+        WHERE group_members.group_id = ? AND status = "pending";`;
+      const [result] = await conn.query(findPendingUser, [groupId]);
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw errMsg.dbError;
+    } finally {
+      conn.release();
+    }
+
+    return 'pendlist';
+  },
   /* async(groupName, userid) => {
     const conn = await pool.getConnection();
     try{}catch(err){}finally{conn.release()}
