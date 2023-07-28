@@ -77,8 +77,8 @@ module.exports = {
         throw errMsg.generateMsg(400, 'Your Request Is Still Pending');
       }
       const checkMembers = `SELECT * from group_members WHERE group_id = ? AND user_id = ? AND status = 'member'`;
-      const [memberId] = await conn.query(checkMembers, [groupId, userId]);
-      if (status.length > 0) {
+      const [member] = await conn.query(checkMembers, [groupId, userId]);
+      if (member.length > 0) {
         throw errMsg.generateMsg(400, 'You Are Already a Member of This Group');
       }
       const insertMemberData = `INSERT INTO group_members (group_id, user_id,status) VALUES (?,?,'pending')`;
