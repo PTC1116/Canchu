@@ -62,6 +62,11 @@ module.exports = {
   joinGroup: async (groupId, userId) => {
     const conn = await pool.getConnection();
     try {
+      const checkGroup = 'SELECT * from user_groups WHERE id = ?';
+      const [groupStatus] = await conn.query(checkGroup, [groupId]);
+      if (groupStatus.length === 0) {
+        throw errMsg.generateMsg(400, 'Group Not Found');
+      }
       const checkUserId =
         'SELECT * from user_groups WHERE id = ? AND creator = ?';
       const [result] = await conn.query(checkUserId, [groupId, userId]);
