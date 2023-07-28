@@ -1,6 +1,5 @@
 const mysql = require('mysql2');
 const errMsg = require('../../util/errorMessage');
-const { agree } = require('./friendModel');
 
 const setPool = mysql.createPool({
   host: process.env.DATABASE_HOST,
