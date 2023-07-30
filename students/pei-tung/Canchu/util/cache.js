@@ -11,7 +11,6 @@ module.exports = {
     return key;
   },
   getProfile: async (targetId) => {
-    console.log('you are searching profile cache');
     const client = redis.createClient();
     try {
       await client.connect();
@@ -25,7 +24,6 @@ module.exports = {
     }
   },
   getFriendship: async (myId, targetId) => {
-    console.log('you are searching friendship cache');
     const client = redis.createClient();
     try {
       await client.connect();
@@ -39,7 +37,6 @@ module.exports = {
     }
   },
   saveProfile: async (obj) => {
-    console.log('you are saving profile cache');
     const client = redis.createClient();
     try {
       const { id, name, picture, introduction, tags } = obj;
@@ -61,7 +58,6 @@ module.exports = {
     }
   },
   saveFriendship: async (myId, targetId, obj) => {
-    console.log('you are saving friendship cache');
     const client = redis.createClient();
     try {
       const { friend_count, friendship } = obj;
@@ -76,7 +72,6 @@ module.exports = {
     }
   },
   delete: async (cacheType, targetId, myId) => {
-    console.log(`you are deleting ${cacheType}`);
     const client = redis.createClient();
     try {
       await client.connect();
@@ -94,14 +89,3 @@ module.exports = {
     }
   },
 };
-
-/*const client = createClient();
-    client.on('connect', () => {
-      console.log('Connected to Redis');
-    });
-
-    client.on('error', (err) => {
-      console.error('Redis error:', err);
-    });
-
-    client.connect();*/
