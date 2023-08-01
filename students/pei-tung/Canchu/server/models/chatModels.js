@@ -46,11 +46,14 @@ module.exports = {
   viewAllMsg: async (myId, targetId, itemsPerQuery, cursor) => {
     const conn = await pool.getConnection();
     try {
+      console.log('?');
       const checkReceiverStatus = 'SELECT id FROM users WHERE id = ?';
       const [receiverStatus] = await conn.query(checkReceiverStatus, [
         targetId,
       ]);
+      console.log(receiverStatus);
       if (receiverStatus.length === 0) {
+        console.log('400');
         throw errMsg.generateMsg(400, 'User Not Found');
       }
       const findAllMsg = `SELECT messages.id AS id, message, 
