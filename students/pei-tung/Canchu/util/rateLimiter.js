@@ -3,8 +3,8 @@ const redis = require('redis');
 
 module.exports = {
   tenReqPerSec: async (req, res, next) => {
-    // const client = redis.createClient();
-    const client = redis.createClient({ host: 'redis-container', port: 6379 });
+    const client = redis.createClient();
+    // const client = redis.createClient({ host: 'redis-container', port: 6379 });
     try {
       const clientIP =
         req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -41,8 +41,8 @@ module.exports = {
     next();
   },
   checkBlockList: async (req, res, next) => {
-    const client = redis.createClient({ host: 'redis-container', port: 6379 });
-    // const client = redis.createClient();
+    //const client = redis.createClient({ host: 'redis-container', port: 6379 });
+    const client = redis.createClient();
     try {
       const clientIP =
         req.headers['x-forwarded-for'] || req.socket.remoteAddress;
