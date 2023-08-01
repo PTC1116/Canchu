@@ -1,0 +1,6 @@
+FROM node:14
+WORKDIR /Canchu
+COPY /Campus-Summer-Back-End/students/pei-tung/Canchu/ .
+RUN npm install
+EXPOSE 3000
+CMD ["node","server.js"]

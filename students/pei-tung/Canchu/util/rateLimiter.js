@@ -57,9 +57,10 @@ module.exports = {
       if (err.status === 429) {
         return res.status(err.status).send({ err: err.error });
       } else {
+        console.log(err);
         return res
           .status(errMsg.redisError.status)
-          .send({ err: redisError.error });
+          .send({ err: errMsg.redisError.error });
       }
     } finally {
       await client.disconnect();
