@@ -160,6 +160,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
