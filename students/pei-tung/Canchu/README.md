@@ -19,3 +19,7 @@
 1. Connect containers to a network. You can connect a container by name or by ID. Once connected, the container can communicate with other containers in the same network.
    `docker run -d -p 3000:3000 canchu-server --network server-and-SQL`
    `docker run -d -p 3306:3306 --name MySQL -e MYSQL_ROOT_PASSWORD=happy1234 --network server-and-SQL mysql:latest`
+
+   docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=happy1234 mysql
+   docker run -d -p 6379:6379 redis
+   docker run -d -p 3000:3000 canchu-server
