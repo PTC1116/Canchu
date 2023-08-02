@@ -1,5 +1,4 @@
-FROM node:14
-# FROM node: 20-alpine3.17
+FROM node: 20-alpine3.17
 WORKDIR /Canchu
 COPY app .
 RUN npm install
