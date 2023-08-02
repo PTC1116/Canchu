@@ -14,18 +14,6 @@ services:
       - canchu
     networks:
       - canchu
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ../../../../CA/certificate.crt:/home/ubuntu/CA/certificate.crt:ro
-      - ../../../../CA/private.key:/home/ubuntu/CA/private.key:ro
-      - ../../../../CA/ca_bundle.crt:/home/ubuntu/CA/ca_bundle.crt:ro
-    depends_on:
-      - canchu
-    networks:
-      - canchu
   db:
     image: mysql:8.0
     container_name: mysql_container
@@ -53,7 +41,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - public_data:/Canchu/public/pictures    
+      - public_data:/Canchu/public/pictures
     depends_on:
       - db
       - redis
