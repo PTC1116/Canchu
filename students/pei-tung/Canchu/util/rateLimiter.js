@@ -3,7 +3,8 @@ const redis = require('redis');
 
 module.exports = {
   tenReqPerSec: async (req, res, next) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     // const client = redis.createClient({ host: 'redis-container', port: 6379 });
     try {
       const clientIP =
