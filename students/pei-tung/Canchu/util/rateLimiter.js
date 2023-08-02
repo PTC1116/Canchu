@@ -41,7 +41,10 @@ module.exports = {
     next();
   },
   checkBlockList: async (req, res, next) => {
-    const client = redis.createClient({ host: 'redis-container', port: 6379 });
+    const client = redis.createClient({
+      host: 'ubuntu-redis-container-1',
+      port: 6379,
+    });
     // const client = redis.createClient();
     try {
       const clientIP =
