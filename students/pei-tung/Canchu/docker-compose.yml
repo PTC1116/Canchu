@@ -1,4 +1,4 @@
- version: '3.8'
+version: '3.8'
 services:
   nginx:
     image: nginx:latest
@@ -27,8 +27,7 @@ services:
     networks:
       - canchu
   redis:
-    image:
-      redis:latest
+    image: redis:latest
     container_name: redis_container
     ports:
       - 6379:6379
@@ -44,3 +43,10 @@ services:
       - redis
     networks:
       - canchu
+
+volumes:
+  mysql_data:
+
+networks:
+  canchu:
+    driver: bridge
