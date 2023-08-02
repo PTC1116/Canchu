@@ -31,6 +31,7 @@ module.exports = {
       if (err.status === 429) {
         return res.status(err.status).send({ err: err.error });
       } else {
+        console.log('limiter error');
         return res
           .status(errMsg.redisError.status)
           .send({ err: errMsg.redisError.error });
@@ -41,10 +42,7 @@ module.exports = {
     next();
   },
   checkBlockList: async (req, res, next) => {
-    const client = redis.createClient({
-      host: 'ubuntu-redis-container-1',
-      port: 6379,
-    });
+    const client = redis.createClient(6379, 'redis_container');
     // const client = redis.createClient();
     try {
       const clientIP =
@@ -63,6 +61,8 @@ module.exports = {
         return res.status(err.status).send({ err: err.error });
       } else {
         console.log(err);
+        console.log('block list error');
+
         return res
           .status(errMsg.redisError.status)
           .send({ err: errMsg.redisError.error });
