@@ -2,7 +2,8 @@ const mysql = require('mysql2');
 const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
-  host: process.env.DATABASE_HOST,
+  // host: process.env.DATABASE_HOST,
+  host: 'mysql_container',
   user: process.env.DATABASE_USER,
   database: process.env.DATABASE_NAME,
   password: process.env.DATABASE_PASSWORD,
