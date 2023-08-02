@@ -15,14 +15,14 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+CREATE DATABASE IF NOT EXISTS;
+
 --
 -- Table structure for table `comments`
 --
-
-DROP TABLE IF EXISTS `comments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `comments` (
+CREATE TABLE IF NOT EXISTS `comments` (
   `id` int NOT NULL AUTO_INCREMENT,
   `author` int NOT NULL,
   `post` int NOT NULL,
@@ -50,10 +50,9 @@ UNLOCK TABLES;
 -- Table structure for table `events`
 --
 
-DROP TABLE IF EXISTS `events`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `events` (
+CREATE TABLE IF NOT EXISTS `events` (
   `id` int NOT NULL AUTO_INCREMENT,
   `type` varchar(100) DEFAULT NULL,
   `performer_id` int DEFAULT NULL,
@@ -83,10 +82,9 @@ UNLOCK TABLES;
 -- Table structure for table `friends`
 --
 
-DROP TABLE IF EXISTS `friends`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `friends` (
+CREATE TABLE IF NOT EXISTS `friends` (
   `id` int NOT NULL AUTO_INCREMENT,
   `requester_id` int DEFAULT NULL,
   `receiver_id` int DEFAULT NULL,
@@ -113,10 +111,9 @@ UNLOCK TABLES;
 -- Table structure for table `group_members`
 --
 
-DROP TABLE IF EXISTS `group_members`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `group_members` (
+CREATE TABLE IF NOT EXISTS `group_members` (
   `id` int NOT NULL AUTO_INCREMENT,
   `group_id` int NOT NULL,
   `user_id` int NOT NULL,
@@ -143,10 +140,9 @@ UNLOCK TABLES;
 -- Table structure for table `group_posts`
 --
 
-DROP TABLE IF EXISTS `group_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `group_posts` (
+CREATE TABLE IF NOT EXISTS `group_posts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `group_id` int NOT NULL,
   `user_id` int NOT NULL,
@@ -174,10 +170,9 @@ UNLOCK TABLES;
 -- Table structure for table `likes`
 --
 
-DROP TABLE IF EXISTS `likes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `likes` (
+CREATE TABLE IF NOT EXISTS `likes` (
   `id` int NOT NULL AUTO_INCREMENT,
   `like_user` int NOT NULL,
   `post` int NOT NULL,
@@ -203,10 +198,9 @@ UNLOCK TABLES;
 -- Table structure for table `messages`
 --
 
-DROP TABLE IF EXISTS `messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `messages` (
+CREATE TABLE IF NOT EXISTS `messages` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sender` int NOT NULL,
   `receiver` int NOT NULL,
@@ -234,10 +228,9 @@ UNLOCK TABLES;
 -- Table structure for table `posts`
 --
 
-DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `posts` (
+CREATE TABLE IF NOT EXISTS `posts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `posted_by` int NOT NULL,
   `context` varchar(255) NOT NULL,
@@ -262,10 +255,9 @@ UNLOCK TABLES;
 -- Table structure for table `user_groups`
 --
 
-DROP TABLE IF EXISTS `user_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_groups` (
+CREATE TABLE IF NOT EXISTS `user_groups` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `creator` int NOT NULL,
@@ -287,10 +279,10 @@ UNLOCK TABLES;
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
+
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
