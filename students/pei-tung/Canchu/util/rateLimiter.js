@@ -42,7 +42,7 @@ module.exports = {
     next();
   },
   checkBlockList: async (req, res, next) => {
-    const client = redis.createClient(6379, 'redis_container');
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     // const client = redis.createClient();
     try {
       const clientIP =
