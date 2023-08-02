@@ -10,7 +10,7 @@
    - 停掉 Nginx: `sudo systemctl stop nginx`
 1. Run Canchu in a docker container
    1. 建立 Dockerfile
-   1. 用 Dockerfile 建立 Server 的映像檔：`docker build -t 映像檔名稱 .`
+   1. 用 Dockerfile 建立 Server 的映像檔：`docker build -t 映像檔名稱 .`（這次跑的是 `docker build -t canchu-server .`）
 1. Connect Node Server to Redis ( 套件為 Node-Redis )
    - 將 Cache 檔案的 `const client = redis.createClient();` 改成 `const client = redis.createClient({ url: 'redis://redis:6379' });`
 1. Connect Node Server to MySQL
@@ -25,3 +25,4 @@
 - `docker-compose logs`: 查看 Docker 執行 log
 - `docker rm 容器名或ID`/`docker rmi 映像檔名或ID`/`docker volume rm voulme名或ID`/`docker network rm network名或ID`: 移除容器/映像檔/volume/network
 - `docker exec -it 容器名或ID 想進行的操作`: 進到 container 中確認實際狀況，可以輸入像是`docker exec -it MySQL的容器名或ID mysql -u root -p`，進去後就能確認容器內的資料庫狀態；或輸入`docker exec -it 含Redis容器名或ID redis-cli`，就能跟容器內的 redis-cli 互動；也可以配合 vi 指令去確認掛在 volumes 下的檔案有沒有被傳到正確的位置
+- `docker volume inspect volume名或ID`: 查詢 volumes 詳細情況（如：本機的具體位置在哪）
