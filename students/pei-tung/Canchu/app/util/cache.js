@@ -12,7 +12,7 @@ module.exports = {
   },
   getProfile: async (targetId) => {
     // const client = redis.createClient();
-    const client = redis.createClient({ url: 'redis://redis:6379' });
+    const client = redis.createClient({ url: process.env.REDIS_URL });
     try {
       await client.connect();
       const key = module.exports.generateProfileKey(targetId);

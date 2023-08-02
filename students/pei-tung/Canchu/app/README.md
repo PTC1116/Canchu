@@ -5,21 +5,21 @@
 1. 在 EC2 上安裝 Docker
    - 見 Week_1_Part_2 的 README
 1. Run MySQL in a docker container
-   先停掉 MySQL：`sudo /etc/init.d/mysql stop`
-   再直接用 Docker 提供的映像檔去跑：`docker run -d -p 3306:3306 --name MySQL -e MYSQL_ROOT_PASSWORD=目標資料庫的密碼 mysql:latest`
+   - 停掉 MySQL: `sudo /etc/init.d/mysql stop`
+   - 停掉 Redis: `sudo systemctl stop redis-server`
+   - 停掉 Nginx: `sudo systemctl stop nginx`
 1. Run Canchu in a docker container
-   ```
-   FROM node:14
-   WORKDIR /Canchu
-   COPY /Campus-Summer-Back-End/students/pei-tung/Canchu/ .
-   RUN npm install
-   EXPOSE 3000
-   CMD ["node","server.js"]
-   ```
+   1. 建立 Dockerfile
+   1. 用 Dockerfile 建立 Server 的映像檔：`docker build -t 映像檔名稱 .`
+1. Connect Node Server to Redis ( 套件為 Node-Redis )
+   - 將 Cache 檔案的 `const client = redis.createClient();` 改成 `const client = redis.createClient({ url: 'redis://redis:6379' });`
+1. Connect Node Server to MySQL
+   - 將舊的資料扔進 SQL
+     1. 將 SQL 的資料先使用 ``
+     1. `docker cp .sql檔案名 MySQL 容器名: 掛到的容器位置`（如：`docker cp backup.sql your_mysql_container:/backup.sql`）
+     1. 進入容器內的 SQL：`docker exec -it your_mysql_container mysql -u root -p`
+     1. 在指定的資料庫內輸入`source 容器內的 .sql 檔位置`（如：`source /backup.sql;`）
+   - 將 SQL Pool 的 host 改為 `host: process.env.DATABASE_HOST` 改成 `host: MySQL 容器的名稱`
+1. 在專案資料夾內新增 nginx.conf 方便 docker-compose.yml 讀取
+   - 將 `proxy_pass http://0.0.0.0:3000;` 改為 `proxy_pass http://Canchu-Server的容器名稱:3000;`
 1. Connect containers to a network. You can connect a container by name or by ID. Once connected, the container can communicate with other containers in the same network.
-   `docker run -d -p 3000:3000 canchu-server --network server-and-SQL`
-   `docker run -d -p 3306:3306 --name MySQL -e MYSQL_ROOT_PASSWORD=happy1234 --network server-and-SQL mysql:latest`
-
-   docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=happy1234 mysql
-   docker run -d -p 6379:6379 redis
-   docker run -d -p 3000:3000 canchu-server
