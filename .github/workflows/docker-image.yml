@@ -60,6 +60,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Run docker-compose.yml
         run: |
+          pwd
           cd ./Campus-Summer-Back-End
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
