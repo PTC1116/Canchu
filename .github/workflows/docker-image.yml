@@ -60,7 +60,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Run docker-compose.yml
         run: |
-          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
-          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
+          docker-compose -f students/pei-tung/Canchu/docker-compose.yml  stop
+          docker-compose -f students/pei-tung/Canchu/docker-compose.yml rm -f
           git pull
-          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
+          docker-compose -f students/pei-tung/Canchu/docker-compose.yml up -d
