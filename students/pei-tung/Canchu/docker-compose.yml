@@ -15,7 +15,7 @@ services:
     networks:
       - canchu
   db:
-    image: mysql:latest
+    image: mysql:8
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
