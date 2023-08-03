@@ -44,8 +44,7 @@ jobs:
       - name: Build and push docker-compose.yml
         run: |
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml build
-          docker tag canchu:latest ${{ secrets.DOCKER_HUB_USERNAME }}/docker-compose:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/docker-compose:${{ steps.vars.outputs.tag }}
+         docker compose -f ./students/pei-tung/Canchu/docker-compose.yml push
   deploy:
     # depends on build_and_push_image job
     needs: build_and_push_image

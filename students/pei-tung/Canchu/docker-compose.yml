@@ -62,5 +62,3 @@ volumes:
 networks:
   canchu:
     driver: bridge
-
-image: canchu
