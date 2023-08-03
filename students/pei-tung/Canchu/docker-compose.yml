@@ -19,9 +19,11 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: canchu
-      MYSQL_PASSWORD: happy1234
-      MYSQL_DATABASE: Canchu
+      #MYSQL_USER: canchu
+      #MYSQL_PASSWORD: happy1234
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_PASSWORD}
     ports:
       - 3306:3306
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
