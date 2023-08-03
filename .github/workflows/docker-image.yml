@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./students/pei-tung/Canchu/Dockerfile
+          file: ./students/pei-tung/Canchu
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
       - name: Build and push docker-compose.yml
