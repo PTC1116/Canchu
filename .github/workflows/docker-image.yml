@@ -15,15 +15,12 @@ jobs:
         working-directory: ./students/pei-tung/Canchu/app
         run: |
           touch .env
-          echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
-          echo DATABASE_USER=${{ secrets.DATABASE_USER }} >> .env
-          echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD}}  >> .env
-          echo DATABASE_NAME=${{ secrets.DATABASE_NAME }} >> .env
-          echo JWT_KEY=${{ secrets.JWT_KEY }} >> .env
-          echo FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }} >> .env
-          echo FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET}} >> .env
-          echo CONTAINER_DATABASE_HOST=${{ secrets.CONTAINER_DATABASE_HOST }} >> .env
-          echo REDIS_URL=${{ secrets.REDIS_URL}} >> .env
+          echo DATABASE_USER=$canchu >> .env
+          echo DATABASE_PASSWORD=happy1234  >> .env
+          echo DATABASE_NAME=Canchu >> .env
+          echo JWT_KEY=IamtheKey >> .env
+          echo CONTAINER_DATABASE_HOST=mysql_container >> .env
+          echo REDIS_URL=redis://redis:6379 >> .env
           cat .env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
