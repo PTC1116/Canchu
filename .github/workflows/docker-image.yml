@@ -29,11 +29,13 @@ jobs:
         run: |
           echo $RELEASE_VERSION
           echo ${{ steps.vars.outputs.tag }}
+      - name: Check Context Directory
+        run: ls -R
       - name: Build and push Dockerfile
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./students/pei-tung/Canchu
+          file: ./students/pei-tung/Canchu/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
       - name: Build and push docker-compose.yml
