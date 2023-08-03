@@ -54,9 +54,9 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            cd Campus-Summer-Back-End
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
+            cd Campus-Summer-Back-End/students/pei-tung/Canchu/d
+            docker-compose  stop
+            docker-compose rm
             git pull
-            docker build -t canchu-server ./students/pei-tung/Canchu/Dockerfile 
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
+            docker build -t canchu-server .
+            docker-compose up -d
