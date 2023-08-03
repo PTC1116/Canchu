@@ -40,20 +40,6 @@ jobs:
           push: true
           no-cache: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
-      - name: Set up Docker Compose
-        run: docker-compose --version
-      - name: Load environment variables from .env
-        uses: aarcangeli/load-dotenv@v1.0.0
-        with:
-          dotenv_path: students/pei-tung/Canchu
-      - name: Build and push docker-compose.yml
-        run: |
-          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml build
-          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml push
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
   deploy:
     # depends on build_and_push_image job
     needs: build_and_push_image
