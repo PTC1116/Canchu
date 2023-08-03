@@ -11,8 +11,8 @@
 FROM node:20-alpine3.17
 WORKDIR /Canchu
 RUN apk update && apk add --no-cache bash
-COPY app /Canchu/app
-COPY wait-for-it/wait-for-it.sh /Canchu/wait-for-it.sh
+COPY ./app /Canchu/app
+COPY ./wait-for-it/wait-for-it.sh /Canchu/wait-for-it.sh
 RUN chmod +x /Canchu/wait-for-it.sh
 RUN npm install
 EXPOSE 3000
