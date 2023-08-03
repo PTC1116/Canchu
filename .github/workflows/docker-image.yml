@@ -40,7 +40,7 @@ jobs:
           file: ./students/pei-tung/Canchu/Dockerfile
           push: true
           no-cache: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/canchu-server:${{ steps.vars.outputs.tag }}
   deploy:
     # depends on build_and_push_image job
     needs: build_and_push_image
