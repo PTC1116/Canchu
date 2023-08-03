@@ -64,7 +64,7 @@ jobs:
         run: ls
       - name: Run docker-compose.yml
         run: |
-          docker-compose -f students/pei-tung/Canchu/docker-compose.yml  stop
+          docker-compose -f /home/ubuntu/Campus-Summer-Back-End/students/pei-tung/Canchu/docker-compose.yml  stop
           docker-compose -f students/pei-tung/Canchu/docker-compose.yml rm -f
           git pull
           docker-compose -f students/pei-tung/Canchu/docker-compose.yml up -d
