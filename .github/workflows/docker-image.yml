@@ -37,6 +37,7 @@ jobs:
           context: .
           file: ./students/pei-tung/Canchu/Dockerfile
           push: true
+          no-cache: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
       - name: Build and push docker-compose.yml
         uses: docker/build-push-action@v3
