@@ -58,10 +58,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Show current working directory
+        run: pwd
+      - name: List files in the current directory
+        run: ls
       - name: Run docker-compose.yml
         run: |
-          pwd
-          ls
           docker-compose -f students/pei-tung/Canchu/docker-compose.yml  stop
           docker-compose -f students/pei-tung/Canchu/docker-compose.yml rm -f
           git pull
