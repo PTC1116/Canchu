@@ -55,8 +55,8 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             cd Campus-Summer-Back-End
-            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
             git pull
+            docker build -t canchu-server .
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
