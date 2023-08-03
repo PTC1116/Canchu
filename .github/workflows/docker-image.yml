@@ -39,13 +39,12 @@ jobs:
           push: true
           no-cache: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
+      - name: Set up Docker Compose
+        run: docker-compose --version
       - name: Build and push docker-compose.yml
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./students/pei-tung/Canchu/docker-compose.yml
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/docker-compose:${{ steps.vars.outputs.tag }}
+        run: |
+          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml build
+          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml push
   deploy:
     # depends on build_and_push_image job
     needs: build_and_push_image
