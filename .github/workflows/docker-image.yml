@@ -44,6 +44,7 @@ jobs:
       - name: Build and push docker-compose.yml
         run: |
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml build
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile-compose.yml:${{ steps.vars.outputs.tag }}
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml push
   deploy:
     # depends on build_and_push_image job
@@ -58,6 +59,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            docker-compose ./students/pei-tung/Canchu/docker-compose.yml stop
-            docker-compose ./students/pei-tung/Canchu/docker-compose.yml rm -f
-            docker-compose ./students/pei-tung/Canchu/docker-compose.yml up -d
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
+            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml stop
+            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
+            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
