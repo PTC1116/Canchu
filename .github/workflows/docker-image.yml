@@ -58,5 +58,5 @@ jobs:
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
             git pull
-            docker build -t canchu-server .
+            docker build -t canchu-server ./students/pei-tung/Canchu/Dockerfile 
             docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
