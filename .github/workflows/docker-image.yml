@@ -22,7 +22,8 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Set output
         id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        #run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: get tag
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
@@ -41,10 +42,16 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dockerfile:${{ steps.vars.outputs.tag }}
       - name: Set up Docker Compose
         run: docker-compose --version
+      - name: Load environment variables from .env
+        uses: appleboy/dotenv-action@v1
       - name: Build and push docker-compose.yml
         run: |
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml build
           docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml push
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
+          MYSQL_USER: ${{ env.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
   deploy:
     # depends on build_and_push_image job
     needs: build_and_push_image
