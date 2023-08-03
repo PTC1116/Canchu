@@ -26,3 +26,8 @@
 - `docker rm 容器名或ID`/`docker rmi 映像檔名或ID`/`docker volume rm voulme名或ID`/`docker network rm network名或ID`: 移除容器/映像檔/volume/network
 - `docker exec -it 容器名或ID 想進行的操作`: 進到 container 中確認實際狀況，可以輸入像是`docker exec -it MySQL的容器名或ID mysql -u root -p`，進去後就能確認容器內的資料庫狀態；或輸入`docker exec -it 含Redis容器名或ID redis-cli`，就能跟容器內的 redis-cli 互動；也可以配合 vi 指令去確認掛在 volumes 下的檔案有沒有被傳到正確的位置
 - `docker volume inspect volume名或ID`: 查詢 volumes 詳細情況（如：本機的具體位置在哪）
+
+#### 待解決：使用 wait-for-it 處理在 SQL 初始化完成前 sever 會先建好的問題
+
+- 會讓 Docker 初始化時一開始出現 CORS Problem （因為 Sever 很晚才開始跑）
+- wait-for-it 的資料好像不能作為 submodule 傳來傳去（該如何管理）
