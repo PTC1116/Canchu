@@ -11,7 +11,8 @@ module.exports = {
     return key;
   },
   getProfile: async (targetId) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: process.env.REDIS_URL });
     try {
       await client.connect();
       const key = module.exports.generateProfileKey(targetId);
@@ -24,7 +25,8 @@ module.exports = {
     }
   },
   getFriendship: async (myId, targetId) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     try {
       await client.connect();
       const key = module.exports.generateFriendshipKey(myId, targetId);
@@ -37,7 +39,8 @@ module.exports = {
     }
   },
   saveProfile: async (obj) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     try {
       const { id, name, picture, introduction, tags } = obj;
       const profileCache = {
@@ -58,7 +61,8 @@ module.exports = {
     }
   },
   saveFriendship: async (myId, targetId, obj) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     try {
       const { friend_count, friendship } = obj;
       const friendshipCache = { friend_count, friendship };
@@ -72,7 +76,8 @@ module.exports = {
     }
   },
   delete: async (cacheType, targetId, myId) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
     try {
       await client.connect();
       let key;

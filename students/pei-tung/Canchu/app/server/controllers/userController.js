@@ -152,6 +152,7 @@ module.exports = {
         },
       };
       cache.delete('profile', id);
+      console.log(successRes);
       return res.status(200).send(successRes);
     } catch (err) {
       console.log(err);

@@ -3,7 +3,9 @@ const redis = require('redis');
 
 module.exports = {
   tenReqPerSec: async (req, res, next) => {
-    const client = redis.createClient();
+    // const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
+    // const client = redis.createClient({ host: 'redis-container', port: 6379 });
     try {
       const clientIP =
         req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -30,6 +32,7 @@ module.exports = {
       if (err.status === 429) {
         return res.status(err.status).send({ err: err.error });
       } else {
+        console.log('limiter error');
         return res
           .status(errMsg.redisError.status)
           .send({ err: errMsg.redisError.error });
@@ -40,7 +43,8 @@ module.exports = {
     next();
   },
   checkBlockList: async (req, res, next) => {
-    const client = redis.createClient();
+    const client = redis.createClient({ url: 'redis://redis:6379' });
+    // const client = redis.createClient();
     try {
       const clientIP =
         req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -57,9 +61,12 @@ module.exports = {
       if (err.status === 429) {
         return res.status(err.status).send({ err: err.error });
       } else {
+        console.log(err);
+        console.log('block list error');
+
         return res
           .status(errMsg.redisError.status)
-          .send({ err: redisError.error });
+          .send({ err: errMsg.redisError.error });
       }
     } finally {
       await client.disconnect();

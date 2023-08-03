@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
-  host: process.env.DATABASE_HOST,
+  //host: process.env.DATABASE_HOST,
+  host: process.env.CONTAINER_DATABASE_HOST,
   user: process.env.DATABASE_USER,
   //database: process.env.DATABASE_NAME,
   database:
@@ -41,6 +42,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
@@ -160,6 +162,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log(err);
         throw errMsg.dbError;
       }
     } finally {
@@ -185,6 +188,7 @@ module.exports = {
       if (err.status === 403) {
         throw err;
       } else {
+        console.log('?');
         throw errMsg.dbError;
       }
     } finally {
