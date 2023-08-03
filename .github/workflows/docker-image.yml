@@ -12,6 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Create env file
+        working-directory: ./students/pei-tung/Canchu/app
         run: |
           touch .env
           echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
@@ -24,8 +25,6 @@ jobs:
           echo CONTAINER_DATABASE_HOST=${{ secrets.CONTAINER_DATABASE_HOST }} >> .env
           echo REDIS_URL=${{ secrets.REDIS_URL}} >> .env
           cat .env
-        env:
-          ENV_FILE_PATH: ./students/pei-tung/Canchu/app
       - name: Check if .env file exists
         run: |
           if [ -f "${ENV_FILE_PATH}/.env" ]; then
