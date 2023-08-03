@@ -19,8 +19,8 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-        #MYSQL_USER: canchu
-        #MYSQL_PASSWORD: happy1234
+      MYSQL_USER: canchu
+      MYSQL_PASSWORD: happy1234
       MYSQL_DATABASE: Canchu
     ports:
       - 3306:3306
