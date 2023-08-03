@@ -3,4 +3,4 @@ app/node_modules/*
 app/coverage/*
 # Ignore the .env file in the root directory
 .env
-# app/.env
+app/.env
