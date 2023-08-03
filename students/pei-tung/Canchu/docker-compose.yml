@@ -22,8 +22,8 @@ services:
       #MYSQL_USER: canchu
       #MYSQL_PASSWORD: happy1234
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_USER}
-      MYSQL_DATABASE: ${MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: Canchu
     ports:
       - 3306:3306
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
