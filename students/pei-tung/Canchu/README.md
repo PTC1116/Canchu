@@ -2,6 +2,8 @@
 
 #### Continuous Integration / Continuous Delivery
 
+參考：https://github.com/azole/cicd-test/blob/main/.github/workflows/build.yml
+
 Set up The GitHub Actions workflow
 Trigger on: merge or push your new code to Github on main branch
 
@@ -12,7 +14,7 @@ Trigger on: merge or push your new code to Github on main branch
    把 node 的 image 拉下來
 
 思路：git push 到特定分支（這次設置是 Main） -> 讓 Github Action 的虛擬環境幫我跑 Dockerfile（建立 canchu-server 的映像檔）並推上我的 Docker Hub -> 連到 EC2 上，停掉原本可能在 EC2 上運行的容器 -> git pull 最新檔案 -> 再跑 docker-compose.yml（此時的 docker-compose.yml 應該會從 Docker Hub 上拉最新的 canchu-server 映像檔）-> 順利運行就結束
-注意 docker compose file 其實不用推上去，直接讓他跑就好了（但 .env 到底要怎麼處理）
+注意：docker-compose.yml 不用推到 Docker Hub 上，直接讓他跑就好了（但 .env 到底要怎麼處理）
 
 為 GitHub Actions 設置環境變數：
 
