@@ -58,6 +58,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            docker-compose stop
-            docker-compose rm -f
-            docker-compose up -d
+            docker-compose ./students/pei-tung/Canchu/docker-compose.yml stop
+            docker-compose ./students/pei-tung/Canchu/docker-compose.yml rm -f
+            docker-compose ./students/pei-tung/Canchu/docker-compose.yml up -d
