@@ -58,9 +58,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          script: |
-            cd ./Campus-Summer-Back-End
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
-            git pull
-            docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
+      - name: Run docker-compose.yml
+        run: |
+          cd ./Campus-Summer-Back-End
+          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml  stop
+          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml rm -f
+          git pull
+          docker-compose -f ./students/pei-tung/Canchu/docker-compose.yml up -d
