@@ -27,7 +27,7 @@ services:
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
     volumes:
       - ./canchu.sql:/docker-entrypoint-initdb.d/init.sql
-        #- mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
       - canchu
   redis:
