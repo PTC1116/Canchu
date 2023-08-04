@@ -46,16 +46,5 @@ jobs:
             docker-compose rm
             git pull
             docker-compose up -d
-            sudo docker exec -it canchu-server /bin/bash
-            touch .env
-            echo "DATABASE_HOST=localhost" >> .env
-            echo "DATABASE_USER=canchu" >> .env
-            echo "DATABASE_PASSWORD=happy1234"  >> .env
-            echo "DATABASE_NAME=Canchu" >> .env
-            echo "JWT_KEY=IamtheKey" >> .env
-            echo "FACEBOOK_APP_ID=196621583060757" >> .env
-            echo "FACEBOOK_APP_SECRET=380de80714fafa20cde2f0bf9145d6f7" >> .env
-            echo "CONTAINER_DATABASE_HOST=mysql_container" >> .env
-            echo "REDIS_URL=redis://redis:6379" >> .env
-            cat .env
+            docker cp .env canchu-server:/Canchu
             docker-compose up -d
