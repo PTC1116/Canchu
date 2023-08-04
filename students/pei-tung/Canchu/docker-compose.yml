@@ -37,7 +37,7 @@ services:
     networks:
       - canchu
   canchu:
-    image: canchu-server
+    image: ptchen1116/canchu-server
     container_name: canchu-server
     ports:
       - 3000:3000
