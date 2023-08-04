@@ -19,17 +19,14 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      #MYSQL_USER: canchu
-      #MYSQL_PASSWORD: happy1234
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: Canchu
     ports:
       - 3306:3306
-        #command: --init-file /docker-entrypoint-initdb.d/init.sql
     volumes:
       - ./canchu.sql:/docker-entrypoint-initdb.d/init.sql
-        #- mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
       - canchu
   redis:
@@ -49,9 +46,6 @@ services:
     depends_on:
       - db
       - redis
-        #CMD ["bash", "/Canchu/wait-for-it.sh", "db:3306", "--", "node", "server.js"]
-
-        #command: ["./wait-for-it.sh", "db:3306","--", "node", "server.js"]
     networks:
       - canchu
 
