@@ -42,8 +42,9 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             cd Campus-Summer-Back-End/students/pei-tung/Canchu
-            docker-compose  stop
+            docker-compose stop
             docker-compose rm
             git pull
-            docker build -t canchu-server .
+    # docker build -t canchu-server .
             docker-compose up -d
+            
