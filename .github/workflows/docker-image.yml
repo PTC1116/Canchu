@@ -25,6 +25,8 @@ jobs:
           echo "CONTAINER_DATABASE_HOST=mysql_container" >> .env
           echo "REDIS_URL=redis://redis:6379" >> .env
           cat .env
+       - name: View the content of a specific file
+        run: cat ${{ github.workspace }}/students/pei-tung/Canchu/app/.env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
