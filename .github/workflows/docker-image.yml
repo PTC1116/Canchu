@@ -47,4 +47,3 @@ jobs:
             git pull
             docker-compose up -d
             docker cp .env canchu-server:/Canchu
-            docker-compose up -d
