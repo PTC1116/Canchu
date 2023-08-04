@@ -22,10 +22,17 @@ services:
       MYSQL_USER: canchu
       MYSQL_PASSWORD: happy1234
       MYSQL_DATABASE: Canchu
+      TZ: Asia/Taipei
     ports:
       - 3306:3306
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
-    command: ln -s /usr/share/zoneinfo/Asia/Taipei /etc/localtime
+    command:
+      [
+        'mysqld',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--default-time-zone=+08:00',
+      ]
     volumes:
       - ./canchu.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
