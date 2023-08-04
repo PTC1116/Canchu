@@ -45,6 +45,4 @@ jobs:
             docker-compose stop
             docker-compose rm
             git pull
-    # docker build -t canchu-server .
             docker-compose up -d
-            
