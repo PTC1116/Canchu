@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Create .env file for node server
-        workdirectory: ./students/pei-tung/Canchu/app
+        working-directory: ./students/pei-tung/Canchu/app
         run: |
           touch .env
           echo "DATABASE_HOST=localhost" >> .env
