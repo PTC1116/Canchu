@@ -1,6 +1,7 @@
 # Ignore the node_modules and coverage directories in the app folder
 app/node_modules/*
 app/coverage/*
+app/.eslintrc.js
 # Ignore the .env file in the root directory
 .env
-# app/.env
+app/.env
