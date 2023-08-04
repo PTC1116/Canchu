@@ -25,6 +25,7 @@ services:
     ports:
       - 3306:3306
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
+    command: ln -s /usr/share/zoneinfo/Asia/Taipei /etc/localtime
     volumes:
       - ./canchu.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
