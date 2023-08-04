@@ -22,7 +22,6 @@ services:
       MYSQL_USER: canchu
       MYSQL_PASSWORD: happy1234
       MYSQL_DATABASE: Canchu
-      TZ: Asia/Taipei"
     ports:
       - 3306:3306
         #command: --init-file /docker-entrypoint-initdb.d/init.sql
