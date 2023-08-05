@@ -6,7 +6,7 @@ process.env.NODE_ENV = 'test';
 describe('POST /signup', () => {
   test('Sign Up Success: 200', async () => {
     const userName = 'user';
-    const userEmail = 'user25@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signup').send({
       name: userName,
       email: userEmail,
@@ -30,7 +30,7 @@ describe('POST /signup', () => {
   });
   test('Sign Up Failed: Email Already Exists', async () => {
     const userName = 'invalidEmail';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signup').send({
       name: userName,
       email: userEmail,
@@ -67,7 +67,7 @@ describe('POST /signup', () => {
   });
   test('Sign Up Failed: Missing User Password', async () => {
     const userName = 'user';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signup').send({
       name: userName,
       email: userEmail,
@@ -83,7 +83,7 @@ describe('POST /signup', () => {
 describe('POST /signin', () => {
   test('Native Sign In Success: 200', async () => {
     const provider = 'native';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signin').send({
       provider: provider,
       email: userEmail,
@@ -107,7 +107,7 @@ describe('POST /signin', () => {
   });
   test('Native Sign In Failed: Wrong Password', async () => {
     const provider = 'native';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signin').send({
       provider: provider,
       email: userEmail,
@@ -129,7 +129,7 @@ describe('POST /signin', () => {
   });
   test('Native Sign In Failed: Missing Provider', async () => {
     const provider = ' ';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signin').send({
       provider: provider,
       email: userEmail,
@@ -155,7 +155,7 @@ describe('POST /signin', () => {
   });
   test('Native Sign In Failed: Missing Password', async () => {
     const provider = 'native';
-    const userEmail = 'user1@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signin').send({
       provider: provider,
       email: userEmail,
