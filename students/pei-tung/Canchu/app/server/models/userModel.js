@@ -4,9 +4,9 @@ const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
   host: process.env.CONTAINER_DATABASE_HOST,
-  // host: 'localhost',
+  host: 'localhost',
   user: process.env.DATABASE_USER,
-  // user: 'root',
+  user: 'root',
   database: process.env.DATABASE_NAME,
   // database:
   // process.env.NODE_ENV === 'test' ? 'Canchu_Test' : process.env.DATABASE_NAME,

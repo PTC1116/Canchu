@@ -6,7 +6,7 @@ process.env.NODE_ENV = 'test';
 describe('POST /signup', () => {
   test('Sign Up Success: 200', async () => {
     const userName = 'user';
-    const userEmail = 'user33@gmail.com';
+    const userEmail = 'user@gmail.com';
     const response = await request(app).post('/api/1.0/users/signup').send({
       name: userName,
       email: userEmail,

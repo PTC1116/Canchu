@@ -29,17 +29,6 @@ jobs:
       - name: Run Test
         run: |
           docker exec canchu-server npm test -- --watch=false --json --outputFile=test-results.json --forceExit
-      - name: Check Jest test results
-        run: |
-          if [ -f "test-results.json" ]; then
-            npm install -g jq
-            passed=$(jq -r '.numPassedTests' test-results.json)
-            failed=$(jq -r '.numFailedTests' test-results.json)
-            if [ "$failed" -gt 0 ]; then
-              echo "Some tests failed! Take appropriate actions." && exit 1 
-            else
-              echo "All tests passed! Continue with the next actions." && exit 0
-            fi
 
   deploy:
     needs: test
