@@ -48,6 +48,11 @@ module.exports = {
       }
     } finally {
       conn.release();
+      /*if (process.env.NODE_ENV === 'test') {
+        pool.end(function (err) {
+          if (err) throw err;
+        });
+      }*/
     }
   },
   nativeSignIn: async (email, password) => {

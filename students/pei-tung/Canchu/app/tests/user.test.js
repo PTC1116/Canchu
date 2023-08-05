@@ -6,7 +6,7 @@ process.env.NODE_ENV = 'test';
 describe('POST /signup', () => {
   test('Sign Up Success: 200', async () => {
     const userName = 'user';
-    const userEmail = 'user@gmail.com';
+    const userEmail = 'user33@gmail.com';
     const response = await request(app).post('/api/1.0/users/signup').send({
       name: userName,
       email: userEmail,
@@ -28,6 +28,7 @@ describe('POST /signup', () => {
     expect(response.body.data.user).toHaveProperty('picture');
     expect(response.statusCode).toBe(200);
   });
+
   test('Sign Up Failed: Email Already Exists', async () => {
     const userName = 'invalidEmail';
     const userEmail = 'user@gmail.com';
