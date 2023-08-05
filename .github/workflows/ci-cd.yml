@@ -15,10 +15,6 @@ jobs:
           echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
           cd app
           echo "${{ secrets.APP_ENV_FILE  }}" > .env
-      - name: Check .env file
-        run: |
-          cat ./students/pei-tung/Canchu/.env
-          cat ./students/pei-tung/Canchu/app/.env
       - name: Start containers
         run: |
           cd ./students/pei-tung/Canchu
@@ -42,9 +38,13 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            cd Campus-Summer-Back-End/students/pei-tung/Canchu
             docker-compose stop
             docker-compose rm
             git pull
+            cd Campus-Summer-Back-End/students/pei-tung/Canchu
+            echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
+            cd app
+            echo "${{ secrets.APP_ENV_FILE  }}" > .env
+            cd ../
             docker build -t canchu-server .
             docker-compose up -d
