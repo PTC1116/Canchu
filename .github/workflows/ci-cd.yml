@@ -16,13 +16,15 @@ jobs:
           cd app
           echo "${{ secrets.APP_ENV_FILE  }}" > .env
           npm i jest
-      - name: Sleep for 120 seconds
-        run: sleep 120
-      - name: Run Test
+      - name: Start containers
         run: |
           cd ./students/pei-tung/Canchu
           docker build -t canchu-server .
           docker-compose up -d
+      - name: Sleep for 20 seconds
+        run: sleep 20
+      - name: Run Test
+        run: |
           docker exec canchu-server npm test -- --watch=false
 
   deploy:
