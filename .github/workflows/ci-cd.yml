@@ -21,8 +21,8 @@ jobs:
           cd ./students/pei-tung/Canchu
           docker build -t canchu-server .
           docker-compose up -d
-      - name: Sleep for 20 seconds
-        run: sleep 20
+      - name: Sleep for 100 seconds
+        run: sleep 100
       - name: Run Test
         run: |
           docker exec canchu-server npm test -- --watch=false
