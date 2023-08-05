@@ -28,7 +28,7 @@ jobs:
         run: sleep 20
       - name: Run Test
         run: |
-          docker exec canchu-server npm test -- --watch=false --json --outputFile=test-results.json --forceExit
+          docker exec canchu-server npm test -- --watch=false --forceExit
 
   deploy:
     needs: test
