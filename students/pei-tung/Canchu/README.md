@@ -4,8 +4,6 @@
 
 [GitHub Action 參考](https://github.com/azole/cicd-test/blob/main/.github/workflows/build.yml)
 
-任務內容：Push your new code to Github on main branch -> Push your docker to dockerhub -> Pull your docker from dockerhub on your EC2 machine and run it
-
 思路：
 git push 到特定分支（為了測試方便，先把這個分支設成了 week_5_part_2 ）-> 讓 Github Action 的虛擬環境幫我把 container 建起來並跑 npm jest -> 連到 EC2 上，停掉原本可能在 EC2 上運行的容器 -> git pull 最新檔案 -> 再跑 docker-compose.yml -> 順利運行就結束
 
