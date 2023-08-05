@@ -15,7 +15,10 @@ jobs:
           echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
           cd app
           echo "${{ secrets.APP_ENV_FILE  }}" > .env
-          npm i jest
+      - name: Check .env file
+        run: |
+          cat ./students/pei-tung/Canchu/.env
+          cat ./students/pei-tung/Canchu/app/.env
       - name: Start containers
         run: |
           cd ./students/pei-tung/Canchu
