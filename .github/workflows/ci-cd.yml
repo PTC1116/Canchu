@@ -17,7 +17,7 @@ jobs:
           echo "${{ secrets.APP_ENV_FILE  }}" > .env
       - name: Run Test
         run: |
-          cd ../
+          cd ./students/pei-tung/Canchu
           docker build -t canchu-server .
           docker-compose up -d
           docker exec canchu-server npm test -- --watch=false
