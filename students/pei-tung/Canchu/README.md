@@ -2,10 +2,10 @@
 
 #### Continuous Integration / Continuous Delivery: Set up The GitHub Actions workflow
 
-[GitHub Action 參考](https://github.com/azole/cicd-test/blob/main/.github/workflows/build.yml)
+[GitHub Actions 參考](https://github.com/azole/cicd-test/blob/main/.github/workflows/build.yml)
 
 思路：
-git push 到特定分支（為了測試方便，先把這個分支設成了 week_5_part_2 ）-> 讓 Github Action 的虛擬環境幫我把 container 建起來並跑 npm jest -> 連到 EC2 上，停掉原本可能在 EC2 上運行的容器 -> git pull 最新檔案 -> 再跑 docker-compose.yml -> 順利運行就結束
+git push 到特定分支（為了測試方便，先把這個分支設成了 week_5_part_2 ）-> 讓 Github Actions 的虛擬環境幫我把 container 建起來並跑 npm jest -> 連到 EC2 上，停掉原本可能在 EC2 上運行的容器 -> git pull 最新檔案 -> 再跑 docker-compose.yml -> 順利運行就結束
 
 #### Note
 
@@ -19,7 +19,7 @@ git push 到特定分支（為了測試方便，先把這個分支設成了 week
 
   跟在測試環境自動切換資料庫的原理一樣，將 Rate Limiter 設置為當 `process.env.NODE_ENV !== 'test'`（即非測試環境）時才會開啟
 
-- 本機的 .env 檔沒辦法直接被 GitHub Action 讀到（因為沒有傳到 GitHub 上），所以用 GitHub Action 跑出來的映像檔會是壞的：
+- 本機的 .env 檔沒辦法直接被 GitHub Actions 讀到（因為沒有傳到 GitHub 上），所以用 GitHub Actions 跑出來的映像檔會是壞的：
 
   使用 echo 指令配上 GitHub Actions 的環境變數功能將 .env 檔貼到虛擬環境上的資料夾中，基本上保持資料夾結構與本機上的一致就可以了（需注意， GitHub Actions 上的檔案位置設定都是以專案的根目錄為起點，而且上一個 step 的移動不會影響到下一個 step，也就是說每一個 step 下 cd 指令時都要從根目錄從頭移動）
 
@@ -32,7 +32,7 @@ git push 到特定分支（為了測試方便，先把這個分支設成了 week
     - `--`: 一個分隔符號，可以將 Docker 命令中的選項與要運行的命令區分開來
     - `--watch=false`: `--watch=false` 是 npm test 命令的一個選項。設置為 false 會禁用測試套件在文件更改時自動重新運行的功能。讓測試套件只會在我們明確地執行 npm test 命令時運行一次，不會因為文件的修改而一直重新運行
 
-- GitHub Action 上的 Jest 無法正常退出（報錯：`Jest did not exit one second after the test run has completed.`）導致無法進入下一步驟：
+- GitHub Actions 上的 Jest 無法正常退出（報錯：`Jest did not exit one second after the test run has completed.`）導致無法進入下一步驟：
 
   報錯的原因應該是 userModel.js 中連結 sql 的 pool 在測試結束後依然在運作，如果用 pool.end() 解決會導致同一支 API 內的第一支 test 跑完後就不能動了，為了避免衍生問題最後用 `--forceExit` 直接強制把 jest 關掉了
 
