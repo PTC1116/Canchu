@@ -38,13 +38,9 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
+            cd Campus-Summer-Back-End/students/pei-tung/Canchu
             docker-compose stop
             docker-compose rm
             git pull
-            cd Campus-Summer-Back-End/students/pei-tung/Canchu
-            echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
-            cd app
-            echo "${{ secrets.APP_ENV_FILE  }}" > .env
-            cd ../
             docker build -t canchu-server .
             docker-compose up -d
