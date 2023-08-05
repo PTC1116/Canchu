@@ -1,0 +1,30 @@
+name: Canchu
+on:
+  push:
+    branches: [week_5_part_2]
+
+jobs:
+  build_and_push_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+  deploy:
+    needs: build_and_push_image
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy to ec2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd Campus-Summer-Back-End/students/pei-tung/Canchu
+            docker-compose stop
+            docker-compose rm
+            git pull
+            docker build -t canchu-server .
+            docker-compose up -d
