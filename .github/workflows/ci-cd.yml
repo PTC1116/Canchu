@@ -4,11 +4,23 @@ on:
     branches: [week_5_part_2]
 
 jobs:
-  build_and_push_image:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Insert .env file
+        run: |
+          cd Campus-Summer-Back-End/students/pei-tung/Canchu
+          echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
+          cd Campus-Summer-Back-End/students/pei-tung/Canchu/app
+          echo "${{ secrets.APP_ENV_FILE  }}" > .env
+      - name: Run Test
+        run: |
+          cd ../
+          docker build -t canchu-server .
+          docker-compose up -d
+          docker exec canchu-server npm test -- --watch=false
 
   deploy:
     needs: build_and_push_image
