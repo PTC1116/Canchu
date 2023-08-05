@@ -11,9 +11,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Insert .env file
         run: |
-          cd Campus-Summer-Back-End/students/pei-tung/Canchu
+          cd Campus-Summer-Back-End/Campus-Summer-Back-End/students/pei-tung/Canchu
           echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
-          cd Campus-Summer-Back-End/students/pei-tung/Canchu/app
+          cd app
           echo "${{ secrets.APP_ENV_FILE  }}" > .env
       - name: Run Test
         run: |
