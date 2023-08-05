@@ -4,7 +4,7 @@
   "description": "## Start a web server on port 80",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack -p",
     "eslintInit": "eslint --init",
     "lint": "eslint util/userUtil.js"
