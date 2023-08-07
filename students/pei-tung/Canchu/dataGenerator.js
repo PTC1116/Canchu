@@ -1,6 +1,8 @@
-/*const http = require('http');
+// 只能一次跑 500 條，不然會輸入貼文的資料會有問題
+
+const http = require('http');
 const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgzLCJwcm92aWRlciI6Im5hdGl2ZSIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJuYW1lIjoidGVzdCIsInBpY3R1cmUiOm51bGwsImlhdCI6MTY5MTM5NDEwMH0.zFBG9TsttfIQUAQ5gxjlTGZvDKlvkHB6InboLjNtE6U`;
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 500; i++) {
   const postData = JSON.stringify({
     context: '嗨',
   });
@@ -33,7 +35,9 @@ for (let i = 0; i < 50; i++) {
   // write data to request body
   req.write(postData);
   req.end();
-}*/
+}
+
+/*
 const mysql = require('mysql2');
 const errMsg = require('./util/errorMessage');
 
@@ -66,4 +70,4 @@ const insert = async () => {
 
 for (let i = 0; i < 10; i++) {
   insert();
-}
+}*/
