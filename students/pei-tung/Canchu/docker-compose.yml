@@ -53,7 +53,6 @@ services:
     volumes:
       - public_data:/Canchu/public/pictures
     depends_on:
-      - db
       - redis
         #CMD ["bash", "/Canchu/wait-for-it.sh", "db:3306", "--", "node", "server.js"]
 
