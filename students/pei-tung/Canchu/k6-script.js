@@ -15,7 +15,7 @@ export const options = {
 };
 // test HTTP
 export default function () {
-  const res = http.get('http://{your url}/api/1.0/posts/search');
+  const res = http.get('http://13.211.10.154/api/1.0/posts/search');
   check(res, { 'status was 200': (r) => r.status == 200 });
   sleep(1);
 }
