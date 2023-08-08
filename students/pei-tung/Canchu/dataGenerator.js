@@ -1,7 +1,7 @@
 // 只能一次跑 500 條，不然會輸入貼文的資料會有問題
 
 const http = require('http');
-const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgzLCJwcm92aWRlciI6Im5hdGl2ZSIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJuYW1lIjoidGVzdCIsInBpY3R1cmUiOm51bGwsImlhdCI6MTY5MTM5NDEwMH0.zFBG9TsttfIQUAQ5gxjlTGZvDKlvkHB6InboLjNtE6U`;
+const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicHJvdmlkZXIiOiJuYXRpdmUiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwibmFtZSI6InRlc3QiLCJwaWN0dXJlIjpudWxsLCJpYXQiOjE2OTE0MTY0MzZ9.zVyKuIy3W5kmU6HGdWUxV_0jz6IunAZcQcoovosEEqk`;
 for (let i = 0; i < 500; i++) {
   const postData = JSON.stringify({
     context: '嗨',
@@ -60,7 +60,6 @@ const insert = async () => {
   try {
     const insertData = `INSERT INTO posts (posted_by, context, created_at) VALUES ('183','嗨', now())`;
     await conn.query(insertData);
-    console.log('insert success');
   } catch (err) {
     throw errMsg.dbError;
   } finally {
