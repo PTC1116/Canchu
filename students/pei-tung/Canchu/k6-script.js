@@ -15,23 +15,6 @@ export const options = {
 };
 // test HTTP
 export default function () {
-  /*
-  const loginPayload = {
-    email: 'test@gmail.com',
-    password: 'test',
-  };
-  const loginHeaders = { 'Content-Type': 'application/json' };
-
-  const myIp = '13.211.10.154';
-  const loginRes = http.post(
-    `https://${myIp}/api/1.0/users/signin`,
-    JSON.stringify(loginPayload),
-    { headers: loginHeaders },
-  );
-  check(loginRes, { 'Login status was 200': (r) => r.status == 200 });
-  const token = loginRes.headers['Authorization'];
-  sleep(1);
-  */
   const myIp = '13.211.10.154';
   const token =
     'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicHJvdmlkZXIiOiJuYXRpdmUiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwibmFtZSI6InRlc3QiLCJwaWN0dXJlIjpudWxsLCJpYXQiOjE2OTE0MTY0MzZ9.zVyKuIy3W5kmU6HGdWUxV_0jz6IunAZcQcoovosEEqk';
