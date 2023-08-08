@@ -2,6 +2,7 @@ version: '3.8'
 services:
   nginx:
     image: nginx:1.25.1
+    restart: always
     ports:
       - 80:80
       - 443:443
@@ -16,6 +17,7 @@ services:
       - canchu
   redis:
     image: redis:7.0.12-alpine
+    restart: always
     container_name: redis_container
     ports:
       - 6379:6379
@@ -23,6 +25,7 @@ services:
       - canchu
   canchu:
     image: canchu-server
+    restart: always
     container_name: canchu-server
     ports:
       - 3000:3000
