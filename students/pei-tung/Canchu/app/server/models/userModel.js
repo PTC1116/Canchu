@@ -3,12 +3,13 @@ const bcrypt = require('bcryptjs');
 const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
-  //host: process.env.DATABASE_HOST,
   host: process.env.CONTAINER_DATABASE_HOST,
+  // host: 'localhost',
   user: process.env.DATABASE_USER,
-  //database: process.env.DATABASE_NAME,
-  database:
-    process.env.NODE_ENV === 'test' ? 'Canchu_Test' : process.env.DATABASE_NAME,
+  // user: 'root',
+  database: process.env.DATABASE_NAME,
+  // database:
+  // process.env.NODE_ENV === 'test' ? 'Canchu_Test' : process.env.DATABASE_NAME,
   password: process.env.DATABASE_PASSWORD,
   waitForConnections: true,
   connectionLimit: 10,
@@ -47,6 +48,11 @@ module.exports = {
       }
     } finally {
       conn.release();
+      /*if (process.env.NODE_ENV === 'test') {
+        pool.end(function (err) {
+          if (err) throw err;
+        });
+      }*/
     }
   },
   nativeSignIn: async (email, password) => {

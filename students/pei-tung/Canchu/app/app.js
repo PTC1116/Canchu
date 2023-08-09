@@ -11,8 +11,10 @@ const postRoutes = require('./server/routes/postRoutes');
 
 app.use(cors());
 
-//app.set('trust proxy', true);
-//app.use(rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
+if (process.env.NODE_ENV !== 'test') {
+  app.set('trust proxy', true);
+  app.use(rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
+}
 
 app.use(express.json());
 app.use(express.static('public'));

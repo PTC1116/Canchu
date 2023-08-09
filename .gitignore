@@ -1,0 +1,13 @@
+# Ignore the node_modules and coverage directories in the app folder
+students/pei-tung/Canchu/app/node_modules/*
+students/pei-tung/Canchu/app/coverage/*
+students/pei-tung/Canchu/private/*
+# Ignore the .env file 
+students/pei-tung/Canchu/.env
+students/pei-tung/Canchu/app/.env
+# Ignore the .DS_Store file 
+.DS_Store
+students/.DS_Store
+students/pei-tung/.DS_Store
+students/pei-tung/Canchu/.DS_Store
+students/pei-tung/Canchu/app/.DS_Store
