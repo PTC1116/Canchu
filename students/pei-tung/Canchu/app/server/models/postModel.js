@@ -3,7 +3,8 @@ const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
   // host: process.env.DATABASE_HOST,
-  host: process.env.CONTAINER_DATABASE_HOST,
+  host: process.env.RDS_HOST,
+  // host: process.env.CONTAINER_DATABASE_HOST,
   user: process.env.DATABASE_USER,
   database: process.env.DATABASE_NAME,
   password: process.env.DATABASE_PASSWORD,
