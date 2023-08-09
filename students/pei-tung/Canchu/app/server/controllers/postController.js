@@ -94,7 +94,8 @@ module.exports = {
       const myId = req.userData.id;
       const itemsPerPage = 10;
       const itemsPerQuery = itemsPerPage + 1;
-      let cursor = (await model.countTotalPost()) + 1;
+      // let cursor = (await model.countTotalPost()) + 1;
+      let cursor = Number.MAX_VALUE;
       const cursorStr = req.query.cursor;
       if (cursorStr) {
         cursor = Buffer.from(cursorStr, 'base64').toString('utf-8');
