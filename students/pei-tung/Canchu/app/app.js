@@ -8,6 +8,7 @@ const userRoutes = require('./server/routes/userRoute');
 const friendRoutes = require('./server/routes/friendRoute');
 const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
+const hello = require('./server/routes/helloWorld');
 
 app.use(cors());
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+app.use('/', hello);
 app.use('/api/1.0/users', userRoutes);
 app.use('/api/1.0/friends', friendRoutes);
 app.use('/api/1.0/events', eventRoutes);

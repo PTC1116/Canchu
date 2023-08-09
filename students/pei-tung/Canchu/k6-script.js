@@ -21,9 +21,12 @@ export default function () {
   const headers = {
     Authorization: `${token}`,
   };
-  const res = http.get(`https://${myIp}/api/1.0/posts/search`, {
-    headers,
-  });
+  const res = http.get(
+    `http://canchu-1204697482.ap-southeast-2.elb.amazonaws.com/api/1.0/posts/search`,
+    {
+      headers,
+    },
+  );
   check(res, { 'status was 200': (r) => r.status == 200 });
   sleep(1);
 }
