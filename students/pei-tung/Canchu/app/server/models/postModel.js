@@ -271,6 +271,7 @@ module.exports = {
         id,
         id,
         cursor,
+        id,
         itemsPerQuery,
       ]);
       return myTimeline;
