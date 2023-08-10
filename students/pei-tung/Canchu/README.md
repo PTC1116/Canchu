@@ -25,3 +25,4 @@
   ```
   除此之外，用了太多 Union，應該用 JOIN 去取代
 - 如果瓶頸是 RDS （不管打幾筆 req 都需要 1 秒才能回傳資料，打 1 筆是 1 秒，1000 筆還是 1 秒），可以考慮擴展 RDS
+- AWS 會藉由向 Load Balancer 的根目錄發出 GET request 檢查 Server 的狀態，所以必須在 '/' 處理 AWS 的 GET request
