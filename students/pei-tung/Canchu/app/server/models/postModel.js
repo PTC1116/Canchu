@@ -256,6 +256,17 @@ module.exports = {
         cursor,
         itemsPerQuery,
       ]);*/
+      /*const getMyTimeline = `
+      SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name,
+      FROM posts AS P
+      LEFT JOIN users AS U ON P.posted_by =  U.id
+      LEFT JOIN friends AS F ON F.status = 'friend' 
+      AND( (F.receiver_id = P.posted_by AND  F.requester_id = ?) 
+      OR (F.requester_id = P.posted_by AND F.receiver_id = ?))
+      WHERE P.id <= ? 
+      AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
+      ORDER BY P.id DESC
+      LIMIT ?;`;*/
       const getMyTimeline = `
       SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name,
       IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
@@ -266,11 +277,14 @@ module.exports = {
       LEFT JOIN friends AS F ON F.status = 'friend' 
       AND( (F.receiver_id = P.posted_by AND  F.requester_id = ?) 
       OR (F.requester_id = P.posted_by AND F.receiver_id = ?))
+      LEFT JOIN comments ON p.id = comments.post
+      LEFT JOIN likes ON p.id = likes.post
       WHERE P.id <= ? 
       AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
       ORDER BY P.id DESC
       LIMIT ?;`;
       const [myTimeline] = await conn.query(getMyTimeline, [
+        id,
         id,
         id,
         cursor,
