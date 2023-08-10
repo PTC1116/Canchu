@@ -277,8 +277,8 @@ module.exports = {
       LEFT JOIN friends AS F ON F.status = 'friend' 
       AND( (F.receiver_id = P.posted_by AND  F.requester_id = ?) 
       OR (F.requester_id = P.posted_by AND F.receiver_id = ?))
-      LEFT JOIN comments ON p.id = comments.post
-      LEFT JOIN likes ON p.id = likes.post
+      LEFT JOIN comments ON P.id = comments.post
+      LEFT JOIN likes ON P.id = likes.post
       WHERE P.id <= ? 
       AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
       ORDER BY P.id DESC
