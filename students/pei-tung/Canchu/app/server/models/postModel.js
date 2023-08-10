@@ -348,4 +348,43 @@ module.exports = {
       await conn.release();
     }
   },
+  /*isLiked: async () => {
+    const conn = await pool.getConnection();
+    try {
+      const query = `SELECT COUNT(post) FROM likes WHERE post = ? AND like_user = ?`;
+      const [[result]] = await conn.query(query);
+      return result.id;
+    } catch (err) {
+      console.log(err);
+      throw errMsg.dbError;
+    } finally {
+      await conn.release();
+    }
+  },
+  likeCount: async () => {
+    const conn = await pool.getConnection();
+    try {
+      const query = `SELECT COUNT(id) FROM likes WHERE post = ?`;
+      const [[result]] = await conn.query(query);
+      return result.id;
+    } catch (err) {
+      console.log(err);
+      throw errMsg.dbError;
+    } finally {
+      await conn.release();
+    }
+  },
+  commentCount: async () => {
+    const conn = await pool.getConnection();
+    try {
+      const query = `SELECT COUNT(id) FROM comments WHERE post = ?`;
+      const [[result]] = await conn.query(query);
+      return result.id;
+    } catch (err) {
+      console.log(err);
+      throw errMsg.dbError;
+    } finally {
+      await conn.release();
+    }
+  },*/
 };
