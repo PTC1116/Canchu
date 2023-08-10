@@ -267,7 +267,6 @@ module.exports = {
       FROM posts AS p
       LEFT JOIN users AS u ON p.posted_by = u.id 
       WHERE p.id < ?
-      ORDER BY p.id DESC
       LIMIT ?;`;
       const [myTimeline] = await conn.query(getMyTimeline, [
         id,

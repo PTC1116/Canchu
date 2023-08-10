@@ -22,7 +22,7 @@ export default function () {
     Authorization: `${token}`,
   };
   const res = http.get(
-    `http://canchu-1204697482.ap-southeast-2.elb.amazonaws.com/api/1.0/posts/search`,
+    /*`http://canchu-1204697482.ap-southeast-2.elb.amazonaws.com/api/1.0/posts/search`*/ `https://13.211.10.154/api/1.0/posts/search`,
     {
       headers,
     },
