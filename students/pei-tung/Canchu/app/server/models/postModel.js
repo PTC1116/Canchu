@@ -257,7 +257,10 @@ module.exports = {
         itemsPerQuery,
       ]);*/
       const getMyTimeline = `
-      SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name
+      SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name,
+      IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
+      (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
+      (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
       FROM posts AS P
       LEFT JOIN users AS U ON P.posted_by =  U.id
       LEFT JOIN friends AS F ON F.status = 'friend' 
