@@ -257,18 +257,18 @@ module.exports = {
         itemsPerQuery,
       ]);*/
       const getMyTimeline = `
-      SELECT DISTINCT p.id, u.id AS user_id, 
-      DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
-      p.context, 
-      IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
-      (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
-      (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
-      u.picture, u.name
-      FROM posts AS p
-      LEFT JOIN users AS u ON p.posted_by = u.id 
-      WHERE p.id < ?
+      SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name
+      FROM posts AS P
+      LEFT JOIN users AS U ON P.posted_by =  U.id
+      LEFT JOIN friends AS F ON F.status = 'friend' 
+      AND( (F.receiver_id = P.posted_by AND  F.requester_id = ?) 
+      OR (F.requester_id = P.posted_by AND F.receiver_id = ?))
+      WHERE P.id <= ? 
+      AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
+      ORDER BY P.id DESC
       LIMIT ?;`;
       const [myTimeline] = await conn.query(getMyTimeline, [
+        id,
         id,
         cursor,
         itemsPerQuery,
