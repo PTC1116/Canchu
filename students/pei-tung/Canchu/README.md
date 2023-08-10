@@ -3,23 +3,21 @@
 #### Auto Scaling
 
 1. Create Launch Template with AMI（Auto Scaling 會根據 Launch Template 去開 EC2）
-1. Create Auto Scaling Groups with the above launch configurations
-1. Attach to the ALB created in Week 5 part 4
-1. Set the following configuration:
+1. Create Auto Scaling Groups with the above launch template
 
+   1. Attach to the ALB created in Week 5 part 4
+   1. Set the following configuration:
 
-    - Desired capacity: 1 (預計會需要的 EC2 數量)
-    - Minimum capacity: 1
-    - Maximum capacity: 3 （加上原本就在 Load Balancer 中的兩台 EC2，最多總共可以打出五台）
+   - Desired capacity: 1 (預計會需要的 EC2 數量)
+   - Minimum capacity: 1
+   - Maximum capacity: 3 （加上原本就在 Load Balancer 中的兩台 EC2，最多總共可以打出五台）
 
-1. Configure Scaling policies:
+   1. Configure Scaling policies:
 
-
-    - Average CPU utilization = 2 （這樣比較容易把其他兩台打出來了）
+   - Average CPU utilization = 2 （這樣比較容易把其他兩台打出來了）
 
 #### Note
 
-- 在 RDS 內有 4000 篇貼文的情況下，k6 script 設置每秒發出 40 個請求時，http_req_duration 的中位數就超出 1 秒了;k6 script 設置每秒發出 30 個請求時，http_req_duration 的中位數大約是 207ms
 - 發現 SQL 的瓶頸是
   ```IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
     (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
