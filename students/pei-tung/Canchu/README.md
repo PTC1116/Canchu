@@ -8,13 +8,13 @@
    1. Attach to the ALB created in Week 5 part 4
    1. Set the following configuration:
 
-   - Desired capacity: 1 (預計會需要的 EC2 數量)
-   - Minimum capacity: 1
-   - Maximum capacity: 3 （加上原本就在 Load Balancer 中的兩台 EC2，最多總共可以打出五台）
+      - Desired capacity: 1 (預計會需要的 EC2 數量)
+      - Minimum capacity: 1
+      - Maximum capacity: 3 （加上原本就在 Load Balancer 中的兩台 EC2，最多總共可以打出五台）
 
    1. Configure Scaling policies:
 
-   - Average CPU utilization = 2 （這樣比較容易把其他兩台打出來了）
+      - Average CPU utilization = 2 （這樣比較容易把其他兩台打出來了）
 
 #### Note
 
