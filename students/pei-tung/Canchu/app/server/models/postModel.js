@@ -218,7 +218,7 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = 'friend';
-      /*const getMyTimeline = `
+      const getMyTimeline = `
       SELECT DISTINCT p.id, u.id AS user_id, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
@@ -255,7 +255,7 @@ module.exports = {
         id,
         cursor,
         itemsPerQuery,
-      ]);*/
+      ]);
       /*const getMyTimeline = `
       SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name,
       FROM posts AS P
@@ -267,25 +267,6 @@ module.exports = {
       AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
       ORDER BY P.id DESC
       LIMIT ?;`;*/
-      const getMyTimeline = `
-      SELECT P.id, P.posted_by, P.created_at, P.context, U.picture, U.name,
-      FROM posts AS P
-      LEFT JOIN users AS U ON P.posted_by =  U.id
-      LEFT JOIN friends AS F ON F.status = 'friend' 
-      AND( (F.receiver_id = P.posted_by AND  F.requester_id = ?) 
-      OR (F.requester_id = P.posted_by AND F.receiver_id = ?))
-      WHERE P.id <= ? 
-      AND ( P.posted_by = ? OR (F.receiver_id IS NOT NULL AND F.requester_id IS NOT NULL))
-      ORDER BY P.id DESC
-      LIMIT ?;`;
-      const [myTimeline] = await conn.query(getMyTimeline, [
-        id,
-        id,
-        id,
-        cursor,
-        id,
-        itemsPerQuery,
-      ]);
       return myTimeline;
     } catch (err) {
       console.log(err);
