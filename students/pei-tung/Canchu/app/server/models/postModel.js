@@ -218,7 +218,7 @@ module.exports = {
     const conn = await pool.getConnection();
     try {
       const friendStatus = 'friend';
-      const getMyTimeline = `
+      /*const getMyTimeline = `
       SELECT DISTINCT p.id, u.id AS user_id, 
       DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
       p.context, 
@@ -252,6 +252,24 @@ module.exports = {
         friendStatus,
         id,
         friendStatus,
+        id,
+        cursor,
+        itemsPerQuery,
+      ]);*/
+      const getMyTimeline = `
+      SELECT DISTINCT p.id, u.id AS user_id, 
+      DATE_FORMAT(p.created_at, "%Y-%m-%d %H:%i:%s") AS created_at, 
+      p.context, 
+      IF((SELECT COUNT(likes.post) FROM likes WHERE likes.post = p.id AND like_user = ?) > 0, true, false) AS is_liked,
+      (SELECT COUNT(likes.id) FROM likes WHERE likes.post = p.id) AS like_count,
+      (SELECT COUNT(comments.id) FROM comments WHERE comments.post = p.id) AS comment_count,
+      u.picture, u.name
+      FROM posts AS p
+      LEFT JOIN users AS u ON p.posted_by = u.id 
+      WHERE p.id < ?
+      ORDER BY p.id DESC
+      LIMIT ?;`;
+      const [myTimeline] = await conn.query(getMyTimeline, [
         id,
         cursor,
         itemsPerQuery,
