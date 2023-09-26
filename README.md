@@ -1,21 +1,23 @@
 # Canchu
-The `Canchu` project is the Back-End program of a social networking platform that empowers users to forge connections and express their thoughts.
+The Back-End program of a social networking platform that empowers users to forge connections and express their thoughts.
 
-# Features
-- user
-    - sign up/sign in
-    - user profile with introduction, picture and past posts
-
-- friend
-    - add/delete friends
-    - agree/delete friend requests
-- event 
-    - send notifications when users send or accept friend requests
-- post
-    - create posts
-    - create and delete likes
-    - create comments
-    - demonstrate user's own timeline
+### Features
+- Users
+    - Sign up
+    - Sign in/Sign in with Facebook
+    - Update pictures
+    - Update introduction
+    - User profiles with an introduction, a picture and users' past posts
+- Friends
+    - Add/delete friends
+    - Agree/delete friend requests
+- Events
+    - Send notifications when users send or accept friend requests
+- Posts
+    - Create posts
+    - Create and delete likes
+    - Create comments
+    - Demonstrate user's own timeline
 
 ### Run in Docker:
 Step1: Pull the repo and Switch to branch week_5_part_5
