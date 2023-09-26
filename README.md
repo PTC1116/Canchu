@@ -1,7 +1,6 @@
 # Canchu
-The Back-End program of a social networking platform that empowers users to forge connections and express their thoughts.
 
-### Features
+## Features
 - Users
     - Sign up
     - Sign in/Sign in with Facebook
@@ -19,7 +18,7 @@ The Back-End program of a social networking platform that empowers users to forg
     - Create comments
     - Demonstrate user's own timeline
 
-### Run in Docker:
+## Run in Docker:
 Step1: Pull the repo and Switch to branch week_5_part_5
 ```bash
 git clone https://github.com/PTC1116/Canchu.git
