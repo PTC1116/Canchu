@@ -31,12 +31,12 @@ vim .env
 ```
 Step3: Create a private directory for nginx config file 
 ```bash
-cd Campus-Summer-Back-End/students/pei-tung
+cd ../../
 mkdir private
 ```
 Step4: Move to the target directory
 ```bash
-cd Campus-Summer-Back-End/students/pei-tung/Canchu
+cd Canchu
 ```
 Step5: Built the docker image
 ```bash
