@@ -48,7 +48,7 @@ Step5: Built the docker image
 ```bash
 docker build -t canchu-server .
 ```
-Step6: Built the docker image
+Step6: Run the program
 ```bash
 docker compose-up -d
 ```
