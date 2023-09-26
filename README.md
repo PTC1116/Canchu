@@ -19,10 +19,10 @@
     - Demonstrate user's own timeline
 
 ## Database Schema
-![Database Schema](https://file%252B.vscode-resource.vscode-cdn.net/Users/ptchen/Downloads/Canchu.png?version%253D1695728612194)
+![Database Schema](Canchu.png)
 
 ## System Design
-![System Design](https://file%252B.vscode-resource.vscode-cdn.net/Users/ptchen/Desktop/%25E6%2588%25AA%25E5%259C%2596%25202023-08-11%2520%25E4%25B8%258A%25E5%258D%258811.39.08.png?version%253D1695728800224)
+![System Design](<截圖 2023-08-11 上午11.39.08.png>)
 
 ## Run in Docker:
 Step1: Pull the repo and Switch to branch week_5_part_5
