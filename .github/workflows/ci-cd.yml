@@ -1,0 +1,46 @@
+name: Canchu
+on:
+  push:
+    branches: [week_5_part_2]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Insert .env file
+        run: |
+          cd ./students/pei-tung/Canchu
+          echo "${{ secrets.DOCKER_ENV_FILE  }}" > .env
+          cd app
+          echo "${{ secrets.APP_ENV_FILE  }}" > .env
+      - name: Start containers
+        run: |
+          cd ./students/pei-tung/Canchu
+          docker build -t canchu-server .
+          docker-compose up -d
+      - name: Sleep for 20 seconds
+        run: sleep 20
+      - name: Run Test
+        run: |
+          docker exec canchu-server npm test -- --watch=false --forceExit
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy to ec2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd Campus-Summer-Back-End/students/pei-tung/Canchu
+            docker-compose stop
+            docker-compose rm
+            git pull
+            docker build -t canchu-server .
+            docker-compose up -d
