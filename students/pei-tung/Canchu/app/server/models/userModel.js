@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const errMsg = require('../../util/errorMessage');
 
 const setPool = mysql.createPool({
-  host: process.env.CONTAINER_DATABASE_HOST,
+  host: process.env.RDS_HOST,
+  // host: process.env.CONTAINER_DATABASE_HOST,
   // host: 'localhost',
   user: process.env.DATABASE_USER,
   // user: 'root',

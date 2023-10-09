@@ -8,17 +8,19 @@ const userRoutes = require('./server/routes/userRoute');
 const friendRoutes = require('./server/routes/friendRoute');
 const eventRoutes = require('./server/routes/eventRoutes');
 const postRoutes = require('./server/routes/postRoutes');
+const hello = require('./server/routes/helloWorld');
 
 app.use(cors());
 
-if (process.env.NODE_ENV !== 'test') {
+/*if (process.env.NODE_ENV !== 'test') {
   app.set('trust proxy', true);
   app.use(rateLimiter.checkBlockList, rateLimiter.tenReqPerSec);
-}
+}*/
 
 app.use(express.json());
 app.use(express.static('public'));
 
+app.use('/', hello);
 app.use('/api/1.0/users', userRoutes);
 app.use('/api/1.0/friends', friendRoutes);
 app.use('/api/1.0/events', eventRoutes);

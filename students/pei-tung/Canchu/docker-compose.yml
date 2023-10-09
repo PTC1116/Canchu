@@ -2,6 +2,7 @@ version: '3.8'
 services:
   nginx:
     image: nginx:1.25.1
+    restart: always
     ports:
       - 80:80
       - 443:443
@@ -14,32 +15,9 @@ services:
       - canchu
     networks:
       - canchu
-  db:
-    image: mysql:8
-    container_name: mysql_container
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: canchu
-      MYSQL_PASSWORD: happy1234
-      MYSQL_DATABASE: Canchu
-      TZ: Asia/Taipei
-    ports:
-      - 3306:3306
-        #command: --init-file /docker-entrypoint-initdb.d/init.sql
-    command:
-      [
-        'mysqld',
-        '--character-set-server=utf8mb4',
-        '--collation-server=utf8mb4_unicode_ci',
-        '--default-time-zone=+08:00',
-      ]
-    volumes:
-      - ./canchu.sql:/docker-entrypoint-initdb.d/init.sql
-      - mysql_data:/var/lib/mysql
-    networks:
-      - canchu
   redis:
     image: redis:7.0.12-alpine
+    restart: always
     container_name: redis_container
     ports:
       - 6379:6379
@@ -47,17 +25,14 @@ services:
       - canchu
   canchu:
     image: canchu-server
+    restart: always
     container_name: canchu-server
     ports:
       - 3000:3000
     volumes:
       - public_data:/Canchu/public/pictures
     depends_on:
-      - db
       - redis
-        #CMD ["bash", "/Canchu/wait-for-it.sh", "db:3306", "--", "node", "server.js"]
-
-        #command: ["./wait-for-it.sh", "db:3306","--", "node", "server.js"]
     networks:
       - canchu
 
